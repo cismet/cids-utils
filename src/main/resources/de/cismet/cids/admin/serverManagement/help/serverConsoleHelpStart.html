@@ -1,0 +1,68 @@
+<html>
+
+<body>
+
+<font size="+1"><b>ServerConsole starten</b></font>
+
+<p>
+  <b>Die ServerConsole wird wie folgt aufgerufen:</b>
+</p>
+<p>
+  <code>ServerConsole -t serverType -n serverClassName [-l log4jConfig] [-p port]
+  [-s serverManagementRoot] [-c miniatureServerConfig] [-a cidsServerArgs]</code><br>
+</p>
+
+<table>
+  <tr>
+    <td valign="top">-t serverType</td>
+    <td valign="top">Bezeichnung des Servertyps (z.B. "cids Registry")</td>
+  </tr>
+  <tr>
+    <td valign="top">-n serverClassName</td>
+    <td valign="top">Vollst&auml;ndiger Klassenname des Servers.</td>
+  </tr>
+  <tr>
+    <td valign="top">-l log4jConfig</td>
+    <td valign="top">Log4j-Konfigurationsdatei. Wird keine angegeben, wird der Log4j
+      BasicConfigurator benutzt.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">-p port</td>
+    <td valign="top">Port, auf dem das Management-Webinterface laufen soll. Wird
+      kein Port angegeben, wird das Webinterface nicht gestartet.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">-s serverManagementRoot</td>
+    <td valign="top">Arbeitsverzeichnis des cids Servermanagements. Wenn keins
+      angegeben wird, wird das Verzeichnis, aus dem die ServerConsole gestartet wurde, zum
+      Arbeitsverzeichnis.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">-c miniatureServerConfig</td>
+    <td valign="top">Konfigurationsdatei f&uuml;r den MiniServer. Wenn keine
+      Konfigurationsdatei f&uuml;r den MiniServer angegeben wird, wird die
+      Standard-Konfigurationsdatei aus dem Classpath genommen.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">-a cidsServerArgs</td>
+    <td valign="top">(Ein oder mehrere) Parameter f&uuml;r den jeweiligen cids Server.
+      Ist unter den Parametern eine Konfigurationsdatei f&uuml;r den cids Server, muss dieser
+      Parameter als erster hinter dem Schalter <i>-a</i> stehen.
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">Die oben aufgef&uuml;hrten Konfigurationsdateien k&ouml;nnen absolut und
+      relativ angegeben werden. Bei einer relativen Angabe wird das Arbeitsverzeichnis des
+      cids Servermanagements als Basis genutzt. Wenn der Schalter -a mit Parametern angegeben
+      wird, muss er der letzte sein.
+    </td>
+  </tr>
+</table>
+
+</body>
+
+</html>

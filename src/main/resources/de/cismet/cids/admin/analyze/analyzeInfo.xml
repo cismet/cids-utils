@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : analyzeInfo.xml
+    Created on : 4. Februar 2004, 13:31
+    Author     : hell
+    Description:
+        Purpose of the document follows.
+-->
+
+<analyzerInformation xmlns='http://www.cismet.de/cids'
+  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+  xsi:schemaLocation='http://www.cismet.de/cids file:/C:/VSS_WORK/CIDS/src/analyzer.xsd'>
+	<group package="de.cismet.cids.admin.analyze.analyzerUnit" description="Beispiel">
+		<analyzer classname="ClassAnalyzer">Beispiel eines Analyzers</analyzer>
+		<analyzer classname="IndexAnalyzer">Analyzer f\u00FCr den Index</analyzer>
+		<analyzer classname="CatalogAnalyzer">Analyzer f\u00FCr den Baum</analyzer>
+		<analyzer classname="UserAnalyzer">Analyzer f\u00FCr den Userbereich</analyzer>
+	</group>
+</analyzerInformation>
