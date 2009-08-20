@@ -1,0 +1,101 @@
+<html>
+
+<body>
+
+<font size="+1"><b>ServerConsole Kurzanleitung</b></font>
+<p>
+  Mit der ServerConsole kann ein cids Server gestartet und administriert werden.
+</p>
+<p>
+  <b>Inhalt</b>
+</p>
+<p>
+  <a href="#serverconsole">Die ServerConsole und ihre Bedienelemente im &Uuml;berblick</a><br>
+  <a href="#fileeditor">Der FileEditor und seine Bedienelemente im &Uuml;berblick</a><br>
+  <a href="#webinterface">Das Server Management Webinterface</a><br>
+</p>
+
+<p>
+  <b>Die ServerConsole und ihre Bedienelemente im &Uuml;berblick</b><a name="serverconsole"></a>
+</p>
+<p>
+  Im "Status & Bedienung" Bereich wird angezeigt, wie lange der cids Server schon
+  l&auml;uft und wie lange es keine Fehler gab. Desweiteren kann mit den Icons im rechten
+  Teil der Titelleiste die ServerConsole minimiert, der cids Server gestoppt und neu
+  gestartet, dessen Serverstatus abgerufen und ein Editor zum Editieren der Konfigurationsdatei
+  aufgerufen werden.
+</p>
+<p>
+  Im "Ausgabe" Bereich werden die Logging-Ausgaben von cids Server und ServerConsole angezeigt.
+  Mit dem Icon in der Titelleiste kann der Inhalt des Anzeigebereichs gel&ouml;scht werden.
+</p>
+<p>
+  Das LED-Symbol unten rechts zeigt den Zustand des cids Servers an.<br>
+  gr&uuml;n: Server l&auml;uft.<br>
+  gelb: Server ist am Hochfahren.<br>
+  rot: Server ist gestoppt.
+</p>
+<p>
+  <img src="serverconsole.png" alt="" border="0">
+</p>
+
+<table>
+  <tr>
+    <td valign="top" width="10%"><img src="tray.png" alt="" border="0"></td>
+    <td width="90%">Minimiert die ServerConsole in die System Tray.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="10%"><img src="exit.png" alt="" border="0"></td>
+    <td width="90%">Beendet den cids Server.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="10%"><img src="restart.png" alt="" border="0"></td>
+    <td width="90%">Startet den cids Server neu.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="10%"><img src="info.png" alt="" border="0"></td>
+    <td width="90%">Zeigt den Serverstatus an.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="10%"><img src="help.png" alt="" border="0"></td>
+    <td width="90%">Ruft diese Hilfedatei auf.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="10%"><img src="edit.png" alt="" border="0"></td>
+    <td width="90%">Startet den FileEditor zum Editieren der cids Server Konfigurationsdatei.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="10%"><img src="delete.png" alt="" border="0"></td>
+    <td width="90%">L&ouml;scht das Protokollausgabe-Fenster.<br></td>
+  </tr>
+</table>
+
+<p>
+  <b>Der FileEditor und seine Bedienelemente im &Uuml;berblick</b><a name="fileeditor"></a>
+</p>
+<p>
+  Der FileEditor wird automatisch mit der Konfigurationsdatei des jeweiligen cids Servers
+  gestartet.
+</p>
+<p>
+  <img src="fileeditor.png" alt="" border="0">
+</p>
+
+<table>
+  <tr>
+    <td valign="top" width="10%"><img src="save.png" alt="" border="0"></td>
+    <td width="90%">Speichert die editierte Konfigurationsdatei.<br></td>
+  </tr>
+</table>
+
+<p><b>Das Server Management Webinterface</b><a name="webinterface"></a> </p>
+
+<p>
+  Wenn der Kommandozeilenparameter <i>port (-p)</i> angegeben wurde, wird das Webinterface
+  auf diesem Port gestartet. Es kann mit folgender Adresse in einem Browser aufgerufen
+  werden: <i>http://adresse_des_serverrechners:port_des_cidsservers</i>
+</p>
+
+</body>
+
+</html>
