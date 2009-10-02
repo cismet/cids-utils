@@ -50,40 +50,36 @@ class MyPrintStream extends PrintStream {
     
     
     @Override
-    public void println(final String s){        
+    public void write(byte[] buf, int off, int len) {
+        final byte[] subBuf = new byte[len];
+        for (int i = off; i < len; i++) {
+            subBuf[i] = buf[off + i];
+        }
+        final String s = new String(subBuf);
         if (logLastInput) {
             lastInput=System.currentTimeMillis();
         }
-        buf.append(s+"\n" );        
+        this.buf.append(s);
         if(hasGui)
         {
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
-                    try {                    
+                    try {
                         theGuiComponent.getDocument().insertString(
                                 theGuiComponent.getDocument().getLength(),
-                                s+"\n", set);                        
+                                s, set);
                         }
-                    catch ( javax.swing.text.BadLocationException ble) {                    
+                    catch ( javax.swing.text.BadLocationException ble) {
                         // no printstacktrace possible else chain reaction
-                    }                    
+                    }
                 }
-            });            
+            });
         }
         else
-            systemOutStream.println(s);
-       
+            systemOutStream.write(buf, off, len);
+
     }
     
-    public void println(Object o) {
-        if (o==null) {
-            buf.append("null\n");
-            println("null");
-        } else {
-            buf.append(o.toString());
-            println(o.toString());
-        }
-    } 
-    
+
     
 }
