@@ -790,7 +790,7 @@ public class ServerConsole extends javax.swing.JFrame {//implements SysTrayMenuL
             if (minuatureServerInstance != null) {
                 minuatureServerInstance.stop();
             }
-        } catch( InterruptedException e) {
+        } catch( Exception e) {
             logger.error("Fehler beim Stoppen Webservers.", e);
         }
     }
