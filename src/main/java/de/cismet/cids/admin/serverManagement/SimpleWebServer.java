@@ -77,15 +77,15 @@ public class SimpleWebServer {
         rootContext.setResourceBase("webinterface");                            // NOI18N
         rootContext.setHandler(new ResourceHandler());
 
+        final Context editorContext = new Context(server, "/fe", Context.SESSIONS); // NOI18N
+        final ServletHolder editorHolder = new ServletHolder(new FileEditorServlet());
+        editorContext.addServlet(editorHolder, "/fileeditor");                    // NOI18N
+
         final Context managerContext = new Context(server, "/", Context.SESSIONS); // NOI18N
         final ServletHolder managerHolder = new ServletHolder(new ServerManager());
         managerContext.addServlet(managerHolder, "/cidsservermanager");            // NOI18N
 
-        final Context editorContext = new Context(server, "/", Context.SESSIONS); // NOI18N
-        final ServletHolder editorHolder = new ServletHolder(new FileEditorServlet());
-        editorContext.addServlet(editorHolder, "/fileeditor");                    // NOI18N
-
-        final Context logContext = new Context(server, "/", Context.SESSIONS); // NOI18N
+        final Context logContext = new Context(server, "/lf", Context.SESSIONS); // NOI18N
         final ServletHolder logHolder = new ServletHolder(new ServerLogFile());
         logContext.addServlet(logHolder, "/serverlogfile");                    // NOI18N
 

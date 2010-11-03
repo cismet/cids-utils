@@ -100,7 +100,7 @@ public class ServerManager extends HttpServlet {
     private void editServerConfigFile(final PrintWriter out) {
         out.println("<script type=\"text/javascript\">\n"
                     + "<!--\n"
-                    + "window.open(\"fileeditor\", \"EditorWindow" + httpPort
+                    + "window.open(\"/fe/fileeditor\", \"EditorWindow" + httpPort
                     + "\", \"width=750,height=550,left=25,top=25,resizable=yes\");\n" // , location=yes, menubar=yes
                     + "//-->\n"
                     + "</script>\n");
@@ -114,7 +114,7 @@ public class ServerManager extends HttpServlet {
     private void getServerLogFile(final PrintWriter out) {
         out.println("<script type=\"text/javascript\">\n"
                     + "<!--\n"
-                    + "window.open(\"serverlogfile\", \"Serverlog" + httpPort
+                    + "window.open(\"/lf/serverlogfile\", \"Serverlog" + httpPort
                     + "\", \"width=750,height=550,left=25,top=25,scrollbars=yes,resizable=yes\");\n"
                     + "//-->\n"
                     + "</script>\n");
