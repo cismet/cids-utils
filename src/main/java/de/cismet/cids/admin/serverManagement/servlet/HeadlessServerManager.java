@@ -372,8 +372,7 @@ public class HeadlessServerManager extends HttpServlet {
                     + "}\n"
                     + "//-->\n"
                     + "</script>\n"
-                    +
-                    // "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssStylesheet + "\">" +
+                    +// "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssStylesheet + "\">" +
                     "</HEAD>\n");
     }
 

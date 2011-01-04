@@ -1,138 +1,173 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * ConnectorPane.java
  *
  * Created on 11. August 2003, 15:51
  */
-
 package de.cismet.common.gui.connectable;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.*;
+
 import java.beans.*;
 
+import java.util.*;
+
+import javax.swing.*;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class ConnectorPane extends javax.swing.JPanel
-{
+public class ConnectorPane extends javax.swing.JPanel {
+
+    //~ Instance fields --------------------------------------------------------
+
     protected ConnectionModel model;
-    
+
     protected final GeneralPath connectorPath;
     protected final LinkedList connectorList;
     protected Stroke stroke;
-    
-    public ConnectorPane()
-    {
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ConnectorPane object.
+     */
+    public ConnectorPane() {
         this(new DefaultConnectionModel());
     }
 
-    /** Creates a new instance of ConnectorPane */
-    public ConnectorPane(ConnectionModel model)
-    {
+    /**
+     * Creates a new instance of ConnectorPane.
+     *
+     * @param  model  DOCUMENT ME!
+     */
+    public ConnectorPane(final ConnectionModel model) {
         this.connectorList = new LinkedList();
         this.connectorPath = new GeneralPath();
-        
+
         this.stroke = new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
-        
+
         this.setOpaque(false);
         this.setDoubleBuffered(true);
         this.setModel(model);
-        
+
         this.getModel().addPropertyChangeListener(new ConnectorPane.ConnectionLineListener());
     }
-    
-    public void setModel(ConnectionModel model)
-    {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  model  DOCUMENT ME!
+     */
+    public void setModel(final ConnectionModel model) {
         this.model = model;
         this.connectorList.clear();
-        
-        if(this.getModel().getLinks().size() > 0)
-        {
-            Iterator iterator = this.getModel().getLinks().iterator();
-            while(iterator.hasNext())
-            {
+
+        if (this.getModel().getLinks().size() > 0) {
+            final Iterator iterator = this.getModel().getLinks().iterator();
+            while (iterator.hasNext()) {
                 this.addConnectionLine((ConnectionLink)iterator.next());
             }
-        } 
+        }
     }
-    
-    public ConnectionModel getModel()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public ConnectionModel getModel() {
         return this.model;
     }
-    
-    // .........................................................................
-    
-    protected void addConnectionLine(ConnectionLink link)
-    { 
+
+    /**
+     * .........................................................................
+     *
+     * @param  link  DOCUMENT ME!
+     */
+    protected void addConnectionLine(final ConnectionLink link) {
         this.connectorList.add(new DefaultConnectionLine(link));
     }
-    
-    protected void removeConnectionLine(ConnectionLink link)
-    {
-        Iterator iterator = this.connectorList.iterator();
-        while(iterator.hasNext())
-        {
-            ConnectionLine line = (ConnectionLine)iterator.next();
-            if(line.getId().equals(link.getId()))
-            {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  link  DOCUMENT ME!
+     */
+    protected void removeConnectionLine(final ConnectionLink link) {
+        final Iterator iterator = this.connectorList.iterator();
+        while (iterator.hasNext()) {
+            final ConnectionLine line = (ConnectionLine)iterator.next();
+            if (line.getId().equals(link.getId())) {
                 iterator.remove();
                 return;
             }
         }
     }
 
-    protected void updatePath()
-    {
+    /**
+     * DOCUMENT ME!
+     */
+    protected void updatePath() {
         this.connectorPath.reset();
-        
-        Iterator iterator = connectorList.iterator();
-        while(iterator.hasNext())
-        {
-            ConnectionLine line = (ConnectionLine)iterator.next();
-            if(line.isDisplayable())
-            {
-                if(line.isChanged())
-                {
+
+        final Iterator iterator = connectorList.iterator();
+        while (iterator.hasNext()) {
+            final ConnectionLine line = (ConnectionLine)iterator.next();
+            if (line.isDisplayable()) {
+                if (line.isChanged()) {
                     line.redraw();
-                    //System.out.println("redraw line: " + line);
+                    // System.out.println("redraw line: " + line);
                 }
 
                 connectorPath.append(line, false);
             }
         }
     }
-    
-    public void paintComponent(Graphics g)
-    {
+
+    @Override
+    public void paintComponent(final Graphics g) {
         super.paintComponent(g);
-        //g.drawLine(50, 50, 500, 500);
+        // g.drawLine(50, 50, 500, 500);
         this.updatePath();
         ((Graphics2D)g).setStroke(stroke);
         ((Graphics2D)g).draw(this.connectorPath);
     }
-    
-    protected class ConnectionLineListener implements PropertyChangeListener
-    {
-        public void propertyChange(PropertyChangeEvent evt)
-        {
-            if(evt.getPropertyName().equals("addLink") && evt.getNewValue() != null)
-            {
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    protected class ConnectionLineListener implements PropertyChangeListener {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void propertyChange(final PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals("addLink") && (evt.getNewValue() != null)) {
                 addConnectionLine((ConnectionLink)evt.getNewValue());
                 repaint();
-            }
-            else if(evt.getPropertyName().equals("removeLink") && evt.getOldValue() != null)
-            {
+            } else if (evt.getPropertyName().equals("removeLink") && (evt.getOldValue() != null)) {
                 removeConnectionLine((ConnectionLink)evt.getOldValue());
                 repaint();
             }
-        }   
+        }
     }
-    
+
     // #########################################################################
 }
-

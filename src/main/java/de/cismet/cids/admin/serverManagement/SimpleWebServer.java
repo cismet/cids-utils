@@ -79,7 +79,7 @@ public class SimpleWebServer {
 
         final Context editorContext = new Context(server, "/fe", Context.SESSIONS); // NOI18N
         final ServletHolder editorHolder = new ServletHolder(new FileEditorServlet());
-        editorContext.addServlet(editorHolder, "/fileeditor");                    // NOI18N
+        editorContext.addServlet(editorHolder, "/fileeditor");                      // NOI18N
 
         final Context managerContext = new Context(server, "/", Context.SESSIONS); // NOI18N
         final ServletHolder managerHolder = new ServletHolder(new ServerManager());
@@ -87,7 +87,7 @@ public class SimpleWebServer {
 
         final Context logContext = new Context(server, "/lf", Context.SESSIONS); // NOI18N
         final ServletHolder logHolder = new ServletHolder(new ServerLogFile());
-        logContext.addServlet(logHolder, "/serverlogfile");                    // NOI18N
+        logContext.addServlet(logHolder, "/serverlogfile");                      // NOI18N
 
         final Context imageContext = new Context(server, "/img", Context.SESSIONS); // NOI18N
         imageContext.setResourceBase("webinterface/img");                           // NOI18N

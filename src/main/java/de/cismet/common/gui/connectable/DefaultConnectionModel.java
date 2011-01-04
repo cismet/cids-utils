@@ -1,143 +1,155 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * DefaultConnectionModel.java
  *
  * Created on 6. August 2003, 17:42
  */
-
 package de.cismet.common.gui.connectable;
 
 import java.beans.PropertyChangeListener;
+
 import java.util.*;
+
 import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class DefaultConnectionModel implements ConnectionModel
-{
-    private final SwingPropertyChangeSupport propertyChangeSupport;
-    
+public class DefaultConnectionModel implements ConnectionModel {
+
+    //~ Instance fields --------------------------------------------------------
+
     protected final ArrayList connectableList;
     protected final ArrayList linkList;
+    private final SwingPropertyChangeSupport propertyChangeSupport;
 
-    
-    /** Creates a new instance of DefaultConnectionModel */
-    public DefaultConnectionModel()
-    {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of DefaultConnectionModel.
+     */
+    public DefaultConnectionModel() {
         this.connectableList = new ArrayList();
         this.linkList = new ArrayList();
         this.propertyChangeSupport = new SwingPropertyChangeSupport(this);
     }
-    
-    public void addConnectable(Connectable connectable)
-    {
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void addConnectable(final Connectable connectable) {
         this.connectableList.add(connectable);
         this.propertyChangeSupport.firePropertyChange("addConnectable", null, connectable);
     }
-    
-    public void removeConnectable(Connectable connectable)
-    {
+
+    @Override
+    public void removeConnectable(final Connectable connectable) {
         this.connectableList.remove(connectable);
         this.removeLinks(connectable);
-        
+
         this.propertyChangeSupport.firePropertyChange("removeConnectable", connectable, null);
     }
-    
-    public void removeConnectable(int index)
-    {
-        Object object = connectableList.remove(index);
-        if(object != null)
-        {
+
+    @Override
+    public void removeConnectable(final int index) {
+        final Object object = connectableList.remove(index);
+        if (object != null) {
             this.removeLinks((Connectable)object);
         }
 
         propertyChangeSupport.firePropertyChange("removeConnectable", object, null);
     }
-    
-    public Connectable getConnectable(int index)
-    {
-         Object object = connectableList.get(index);
-         return object != null ? (Connectable)object : null;
+
+    @Override
+    public Connectable getConnectable(final int index) {
+        final Object object = connectableList.get(index);
+        return (object != null) ? (Connectable)object : null;
     }
-    
-    public List getConnectables()
-    {
+
+    @Override
+    public List getConnectables() {
         return Collections.unmodifiableList(this.connectableList);
     }
-    
-    public void addLink(ConnectionLink link)
-    {
+
+    @Override
+    public void addLink(final ConnectionLink link) {
         link.link();
         linkList.add(link);
-        
+
         propertyChangeSupport.firePropertyChange("addLink", null, link);
     }
-    
-    public void removeLink(ConnectionLink link)
-    {
+
+    @Override
+    public void removeLink(final ConnectionLink link) {
         linkList.remove(link);
         link.unlink();
-        
+
         propertyChangeSupport.firePropertyChange("removeLink", link, null);
     }
-    
-    public void removeLink(int index)
-    {
-        Object object = linkList.remove(index);
-        if(object != null)
-        {
+
+    @Override
+    public void removeLink(final int index) {
+        final Object object = linkList.remove(index);
+        if (object != null) {
             ((ConnectionLink)object).unlink();
         }
-        
+
         propertyChangeSupport.firePropertyChange("removeLink", object, null);
     }
-    
-    public ConnectionLink getLink(int index)
-    {
-         Object object = linkList.get(index);
-         return object != null ? (ConnectionLink)object : null;
+
+    @Override
+    public ConnectionLink getLink(final int index) {
+        final Object object = linkList.get(index);
+        return (object != null) ? (ConnectionLink)object : null;
     }
-    
-    public List getLinks()
-    {
+
+    @Override
+    public List getLinks() {
         return Collections.unmodifiableList(this.linkList);
     }
-    
-    
-    public void addPropertyChangeListener(PropertyChangeListener listener)
-    {
+
+    @Override
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
     }
-    
-    public void removePropertyChangeListener(PropertyChangeListener listener)
-    {
+
+    @Override
+    public void removePropertyChangeListener(final PropertyChangeListener listener) {
         this.propertyChangeSupport.removePropertyChangeListener(listener);
     }
-    
-    public void clear()
-    {
-        LinkedList connectableList = new LinkedList();
+
+    @Override
+    public void clear() {
+        final LinkedList connectableList = new LinkedList();
         connectableList.addAll(this.getConnectables());
-        
-        Iterator iterator = connectableList.iterator();
-        while(iterator.hasNext())
-        {
+
+        final Iterator iterator = connectableList.iterator();
+        while (iterator.hasNext()) {
             this.removeConnectable((Connectable)iterator.next());
         }
-        
+
         this.connectableList.clear();
         this.linkList.clear();
     }
-    
-    // .........................................................................
-    
-    protected void removeLinks(Connectable connectable)
-    {
-        Iterator iterator = new LinkedList(connectable.getLinks()).iterator();
-        while(iterator.hasNext())
-        {
-            ConnectionLink link = (ConnectionLink)iterator.next();
+
+    /**
+     * .........................................................................
+     *
+     * @param  connectable  DOCUMENT ME!
+     */
+    protected void removeLinks(final Connectable connectable) {
+        final Iterator iterator = new LinkedList(connectable.getLinks()).iterator();
+        while (iterator.hasNext()) {
+            final ConnectionLink link = (ConnectionLink)iterator.next();
             this.removeLink(link);
         }
     }

@@ -1,60 +1,89 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * DefaultHistory.java
  *
  * Created on 9. September 2003, 16:15
  */
-
 package de.cismet.common.gui.sqlwizard;
 
 import java.beans.*;
-import javax.swing.event.*;
+
 import java.util.*;
 
+import javax.swing.event.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class DefaultHistory extends AbstractHistory
-{
-    protected final PropertyChangeSupport propertyChangeSupport;    
-    
-    /** Creates a new instance of DefaultHistory */
-    public DefaultHistory()
-    {
+public class DefaultHistory extends AbstractHistory {
+
+    //~ Instance fields --------------------------------------------------------
+
+    protected final PropertyChangeSupport propertyChangeSupport;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of DefaultHistory.
+     */
+    public DefaultHistory() {
         this(8);
     }
-    
-    public DefaultHistory(int maxHistorySize)
-    {
+
+    /**
+     * Creates a new DefaultHistory object.
+     *
+     * @param  maxHistorySize  DOCUMENT ME!
+     */
+    public DefaultHistory(final int maxHistorySize) {
         super(maxHistorySize);
         this.propertyChangeSupport = new SwingPropertyChangeSupport(this);
         this.historyList = new LinkedList();
     }
-    
-    public DefaultHistory(int maxHistorySize, PropertyChangeSupport propertyChangeSupport)
-    {
+
+    /**
+     * Creates a new DefaultHistory object.
+     *
+     * @param  maxHistorySize         DOCUMENT ME!
+     * @param  propertyChangeSupport  DOCUMENT ME!
+     */
+    public DefaultHistory(final int maxHistorySize, final PropertyChangeSupport propertyChangeSupport) {
         super(maxHistorySize);
         this.propertyChangeSupport = propertyChangeSupport;
         this.historyList = new LinkedList();
     }
-    
-    public void setSelectedIndex(int selectedIndex)
-    {
-        if(selectedIndex >= 0 && this.selectedIndex != selectedIndex && selectedIndex < this.historyList.size() && this.historyList.get(selectedIndex) != null)
-        {
-            int oldSelectedIndex = this.selectedIndex;
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void setSelectedIndex(final int selectedIndex) {
+        if ((selectedIndex >= 0) && (this.selectedIndex != selectedIndex) && (selectedIndex < this.historyList.size())
+                    && (this.historyList.get(selectedIndex) != null)) {
+            final int oldSelectedIndex = this.selectedIndex;
             this.selectedIndex = selectedIndex;
-            this.propertyChangeSupport.firePropertyChange(SELECTED_HISTORY_ENTRY, new Integer(oldSelectedIndex), new Integer(selectedIndex));
+            this.propertyChangeSupport.firePropertyChange(
+                SELECTED_HISTORY_ENTRY,
+                new Integer(oldSelectedIndex),
+                new Integer(selectedIndex));
         }
     }
-    
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener l)
-    {
+
+    @Override
+    public void removePropertyChangeListener(final java.beans.PropertyChangeListener l) {
         this.propertyChangeSupport.removePropertyChangeListener(l);
     }
-    
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener l)
-    {
+
+    @Override
+    public void addPropertyChangeListener(final java.beans.PropertyChangeListener l) {
         this.propertyChangeSupport.addPropertyChangeListener(l);
     }
 }

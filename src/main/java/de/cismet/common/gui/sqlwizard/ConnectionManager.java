@@ -1,297 +1,312 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * ConnectionManager.java
  *
  * Created on 5. September 2003, 12:16
  */
-
 package de.cismet.common.gui.sqlwizard;
-
-import javax.swing.*;
-import java.sql.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
 
 import org.apache.log4j.*;
 
+import java.awt.*;
+import java.awt.event.*;
+
+import java.sql.*;
+
+import java.util.*;
+
+import javax.swing.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class ConnectionManager extends javax.swing.JPanel
-{
+public class ConnectionManager extends javax.swing.JPanel {
+
+    //~ Instance fields --------------------------------------------------------
+
     private final Logger logger;
-    
+
     private final Properties driverProperties;
     private Connection connection = null;
-    
-    
-    /** Creates new form ConnectionManager */
-    public ConnectionManager()
-    {
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addDriverButton;
+    private javax.swing.JPanel buttonPanel;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JButton connectButton;
+    private javax.swing.JComboBox driverBox;
+    private javax.swing.JPasswordField passwordField;
+    private javax.swing.JLabel statusLabel;
+    private javax.swing.JTextField urlField;
+    private javax.swing.JTextField usernamelField;
+    // End of variables declaration//GEN-END:variables
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form ConnectionManager.
+     */
+    public ConnectionManager() {
         this.logger = Logger.getLogger(this.getClass());
         this.driverProperties = new Properties();
-        
+
         initComponents();
-        
-        ActionListener actionListener = new ButtonListener();
+
+        final ActionListener actionListener = new ButtonListener();
         this.connectButton.addActionListener(actionListener);
         this.cancelButton.addActionListener(actionListener);
-        
+
         this.update();
     }
-    
-    
-    public void update()
-    {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void update() {
         this.driverBox.removeAllItems();
         Enumeration drivers = DriverManager.getDrivers();
-        
-        if(!drivers.hasMoreElements())
-        {
-            try
-            {
+
+        if (!drivers.hasMoreElements()) {
+            try {
                 logger.warn("no JDBC drivers found, loading default ODBC driver");
                 Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
                 drivers = DriverManager.getDrivers();
-            }
-            catch(Exception exp)
-            {
+            } catch (Exception exp) {
                 logger.error("Default ODBC driver not found.", exp);
             }
         }
-        
-        while(drivers.hasMoreElements())
-        {
+
+        while (drivers.hasMoreElements()) {
             this.driverBox.addItem((Driver)drivers.nextElement());
         }
-        
-        if(this.driverBox.getItemCount() > 0)
-        {
+
+        if (this.driverBox.getItemCount() > 0) {
             this.setStatus(this.driverBox.getItemCount() + " JDBC driver(s) found.", false);
-            logger.debug(this.statusLabel.getText());
-        }
-        else
-        {
+            if (logger.isDebugEnabled()) {
+                logger.debug(this.statusLabel.getText());
+            }
+        } else {
             this.setStatus("No JDBC drivers could be found.", true);
             logger.error(this.statusLabel.getText());
-        } 
+        }
     }
-    
-    public void reset()
-    {
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void reset() {
         this.driverBox.setSelectedIndex(0);
         this.usernamelField.setText(null);
         this.passwordField.setText(null);
         this.urlField.setText(null);
     }
-    
-    protected void addAppender(org.apache.log4j.Appender appender)
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  appender  DOCUMENT ME!
+     */
+    protected void addAppender(final org.apache.log4j.Appender appender) {
         this.logger.addAppender(appender);
     }
-    
-    private void connect()
-    {
-        if(this.driverBox.getSelectedIndex() < 0)
-        {
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void connect() {
+        if (this.driverBox.getSelectedIndex() < 0) {
             this.setStatus("No JDBC Driver selected.", true);
-        }
-        else if (this.urlField.getText().length() <= 0)
-        {
+        } else if (this.urlField.getText().length() <= 0) {
             this.setStatus("URL field can't be empty.", true);
-        }
-        else
-        {
-            this.connectButton.setEnabled(false); 
-            this.cancelButton.setEnabled(true); 
-            
-            try
-            {
-                Driver driver = (Driver)this.driverBox.getSelectedItem();
-                if(driver.acceptsURL(this.urlField.getText()))
-                {
+        } else {
+            this.connectButton.setEnabled(false);
+            this.cancelButton.setEnabled(true);
+
+            try {
+                final Driver driver = (Driver)this.driverBox.getSelectedItem();
+                if (driver.acceptsURL(this.urlField.getText())) {
                     this.setStatus("Connecting to '" + this.urlField.getText() + "'.", false);
                     logger.info(this.statusLabel.getText());
                     this.connectButton.setEnabled(false);
                     this.driverProperties.setProperty("username", this.usernamelField.getText());
                     this.driverProperties.setProperty("password", new String(this.passwordField.getPassword()));
 
-                    this.setConnection(driver.connect(this.urlField.getText(),  this.driverProperties));
+                    this.setConnection(driver.connect(this.urlField.getText(), this.driverProperties));
 
-                    if(this.isConnected())
-                    {
+                    if (this.isConnected()) {
                         this.setStatus("Successfull connected to '" + this.urlField.getText() + "'.", false);
                         logger.info(this.statusLabel.getText());
-                    }
-                    else
-                    { 
+                    } else {
                         this.setStatus("Connection failed: unknown reason.", true);
                         logger.error(this.statusLabel.getText());
                     }
-                }
-                else
-                {
+                } else {
                     this.setStatus("Wrong URL format '" + this.urlField.getText() + "'.", true);
                     logger.warn(this.statusLabel.getText());
-                }   
-            }
-            catch(SQLException sqlexp)
-            { 
+                }
+            } catch (SQLException sqlexp) {
                 this.setConnection(null);
                 this.setStatus(sqlexp.getMessage(), true);
                 logger.error(this.statusLabel.getText(), sqlexp);
             }
-            
-            this.connectButton.setEnabled(true); 
-            this.cancelButton.setEnabled(false); 
+
+            this.connectButton.setEnabled(true);
+            this.cancelButton.setEnabled(false);
         }
     }
-    
-    public String getDriverName()
-    {
-        if(this.driverBox.getSelectedIndex() < 0)
-        {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getDriverName() {
+        if (this.driverBox.getSelectedIndex() < 0) {
             return new String();
-        }
-        else
-        {
+        } else {
             return this.driverBox.getSelectedItem().getClass().getName();
         }
     }
-    
-    public String getConnectionString()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getConnectionString() {
         return this.urlField.getText();
     }
-    
-    public String getUsername()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getUsername() {
         return this.usernamelField.getText();
     }
-    
-    public String getPassword()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getPassword() {
         return new String(this.passwordField.getPassword());
     }
-    
-    /** Setter for property username.
-     * @param username New value of property username.
+
+    /**
+     * Setter for property username.
      *
+     * @param  username  New value of property username.
      */
-    public void setUsername(String username)
-    {
-        if(username != null)
-        {
+    public void setUsername(final String username) {
+        if (username != null) {
             this.usernamelField.setText(username);
         }
-    }    
+    }
 
-    /** Setter for property driverName.
-     * @param driverName New value of property driverName.
+    /**
+     * Setter for property driverName.
      *
+     * @param  driverName  New value of property driverName.
      */
-    public void setDriverName(String driverName)
-    {
-        if(driverName != null)
-        {
+    public void setDriverName(final String driverName) {
+        if (driverName != null) {
             this.driverBox.setSelectedItem(driverName);
         }
-    }    
-    
-    /** Setter for property connectionString.
-     * @param connectionString New value of property connectionString.
+    }
+
+    /**
+     * Setter for property connectionString.
      *
+     * @param  connectionString  New value of property connectionString.
      */
-    public void setConnectionString(String connectionString)
-    {
+    public void setConnectionString(final String connectionString) {
         this.urlField.setText(connectionString);
     }
 
-    public Connection getConnection()
-    {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Connection getConnection() {
         return this.connection;
     }
-    
-    public void setConnection(Connection connection)
-    {
-        Connection oldConnection = this.connection;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  connection  DOCUMENT ME!
+     */
+    public void setConnection(final Connection connection) {
+        final Connection oldConnection = this.connection;
         this.connection = connection;
-        
+
         this.firePropertyChange("connection", oldConnection, connection);
     }
-    
-    public boolean isConnected()
-    {
-        if(this.connection != null)
-        {
-            try
-            {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isConnected() {
+        if (this.connection != null) {
+            try {
                 return !this.connection.isClosed();
+            } catch (SQLException sqlexp) {
             }
-            catch(SQLException sqlexp){}
         }
-        
+
         return false;
     }
-    
-    private void setStatus(final String message, final boolean error)
-    {
-        if(SwingUtilities.isEventDispatchThread())
-        {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  message  DOCUMENT ME!
+     * @param  error    DOCUMENT ME!
+     */
+    private void setStatus(final String message, final boolean error) {
+        if (SwingUtilities.isEventDispatchThread()) {
             this.statusLabel.setForeground(error ? Color.RED : Color.BLUE);
             this.statusLabel.setText(message);
-        }
-        else
-        {
-            SwingUtilities.invokeLater(new Runnable()
-            {
-                public void run()
-                {
-                    statusLabel.setForeground(error ? Color.RED : Color.BLUE);
-                    statusLabel.setText(message);
-                }
-            });
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        statusLabel.setForeground(error ? Color.RED : Color.BLUE);
+                        statusLabel.setText(message);
+                    }
+                });
         }
     }
-    
-    // .........................................................................
-    
-    private class DriverListRenderer extends DefaultListCellRenderer
-    {
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) 
-        {
-            return super.getListCellRendererComponent(list, (value != null ? value.getClass().getName() : "null"), index, isSelected, cellHasFocus);
-        }
-    }
-    
-    private class ButtonListener implements ActionListener
-    { 
-        public void actionPerformed(ActionEvent e)
-        {
-            if(e.getActionCommand().equalsIgnoreCase("connect"))
-            {
-                connect();
-            }
-            else
-            {
-                setConnection(null);
-            }
-        }
-    }
-    
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
-    private void initComponents()//GEN-BEGIN:initComponents
+    private void initComponents()                                                //GEN-BEGIN:initComponents
     {
-        javax.swing.JLabel driverLabel;
+        final javax.swing.JLabel driverLabel;
         java.awt.GridBagConstraints gridBagConstraints;
-        javax.swing.JLabel passwordLabel;
-        javax.swing.JLabel urlLabel;
-        javax.swing.JLabel usernamelLabel;
+        final javax.swing.JLabel passwordLabel;
+        final javax.swing.JLabel urlLabel;
+        final javax.swing.JLabel usernamelLabel;
 
         driverLabel = new javax.swing.JLabel();
         driverBox = new javax.swing.JComboBox();
@@ -422,7 +437,9 @@ public class ConnectionManager extends javax.swing.JPanel
         statusLabel.setFont(new java.awt.Font("Dialog", 1, 10));
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         statusLabel.setText(" ");
-        statusLabel.setBorder(new javax.swing.border.CompoundBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED), new javax.swing.border.EmptyBorder(new java.awt.Insets(0, 2, 0, 2))));
+        statusLabel.setBorder(new javax.swing.border.CompoundBorder(
+                new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED),
+                new javax.swing.border.EmptyBorder(new java.awt.Insets(0, 2, 0, 2))));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -431,41 +448,59 @@ public class ConnectionManager extends javax.swing.JPanel
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(statusLabel, gridBagConstraints);
+    } //GEN-END:initComponents
 
-    }//GEN-END:initComponents
+    //~ Inner Classes ----------------------------------------------------------
 
-    
-    
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton addDriverButton;
-    private javax.swing.JPanel buttonPanel;
-    private javax.swing.JButton cancelButton;
-    private javax.swing.JButton connectButton;
-    private javax.swing.JComboBox driverBox;
-    private javax.swing.JPasswordField passwordField;
-    private javax.swing.JLabel statusLabel;
-    private javax.swing.JTextField urlField;
-    private javax.swing.JTextField usernamelField;
-    // End of variables declaration//GEN-END:variables
-    
-    
+    /**
+     * .........................................................................
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class DriverListRenderer extends DefaultListCellRenderer {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public Component getListCellRendererComponent(final JList list,
+                final Object value,
+                final int index,
+                final boolean isSelected,
+                final boolean cellHasFocus) {
+            return super.getListCellRendererComponent(
+                    list,
+                    ((value != null) ? value.getClass().getName() : "null"),
+                    index,
+                    isSelected,
+                    cellHasFocus);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class ButtonListener implements ActionListener {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            if (e.getActionCommand().equalsIgnoreCase("connect")) {
+                connect();
+            } else {
+                setConnection(null);
+            }
+        }
+    }
+
     /*public static void main(String args[])
-    {
-        ConnectionManager cm = new ConnectionManager();
-
-        MessageArea ma = new MessageArea();
-        ma.setRows(5);
-        
-        cm.logger.addAppender(ma.getAppender());
-        cm.update();
-        
-        JFrame jf = new JFrame("ConnectionManager");
-        jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE);
-        jf.setLocationRelativeTo(null);
-        jf.getContentPane().setLayout(new BorderLayout());
-        jf.getContentPane().add(cm, BorderLayout.CENTER);
-        jf.getContentPane().add(new JScrollPane(ma), BorderLayout.SOUTH);
-        jf.pack();
-        jf.setVisible(true);
-    }*/
+     * { ConnectionManager cm = new ConnectionManager();
+     *
+     * MessageArea ma = new MessageArea(); ma.setRows(5);  cm.logger.addAppender(ma.getAppender()); cm.update();  JFrame
+     * jf = new JFrame("ConnectionManager"); jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE);
+     * jf.setLocationRelativeTo(null); jf.getContentPane().setLayout(new BorderLayout()); jf.getContentPane().add(cm,
+     * BorderLayout.CENTER); jf.getContentPane().add(new JScrollPane(ma), BorderLayout.SOUTH); jf.pack();
+     * jf.setVisible(true);}*/
 }

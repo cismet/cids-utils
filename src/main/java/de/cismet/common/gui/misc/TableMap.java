@@ -1,5 +1,11 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.common.gui.misc;
-
 
 /**
  * In a chain of data manipulators some behaviour is common. TableMap
@@ -13,70 +19,86 @@ package de.cismet.common.gui.misc;
  * @version 1.4 12/17/97
  * @author Philip Milne */
 
-import javax.swing.table.*;
-import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.*;
 
-public class TableMap extends AbstractTableModel
-implements TableModelListener
-{
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
+public class TableMap extends AbstractTableModel implements TableModelListener {
+
+    //~ Instance fields --------------------------------------------------------
+
     protected TableModel model;
-    
-    public TableModel getModel()
-    {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public TableModel getModel() {
         return model;
     }
-    
-    public void setModel(TableModel model)
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  model  DOCUMENT ME!
+     */
+    public void setModel(final TableModel model) {
         this.model = model;
         model.addTableModelListener(this);
         this.fireTableStructureChanged();
     }
-    
+
     // By default, implement TableModel by forwarding all messages
     // to the model.
-    
-    public Object getValueAt(int aRow, int aColumn)
-    {
+
+    @Override
+    public Object getValueAt(final int aRow, final int aColumn) {
         return model.getValueAt(aRow, aColumn);
     }
-    
-    public void setValueAt(Object aValue, int aRow, int aColumn)
-    {
+
+    @Override
+    public void setValueAt(final Object aValue, final int aRow, final int aColumn) {
         model.setValueAt(aValue, aRow, aColumn);
     }
-    
-    public int getRowCount()
-    {
+
+    @Override
+    public int getRowCount() {
         return (model == null) ? 0 : model.getRowCount();
     }
-    
-    public int getColumnCount()
-    {
+
+    @Override
+    public int getColumnCount() {
         return (model == null) ? 0 : model.getColumnCount();
     }
-    
-    public String getColumnName(int aColumn)
-    {
+
+    @Override
+    public String getColumnName(final int aColumn) {
         return model.getColumnName(aColumn);
     }
-    
-    public Class getColumnClass(int aColumn)
-    {
+
+    @Override
+    public Class getColumnClass(final int aColumn) {
         return model.getColumnClass(aColumn);
     }
-    
-    public boolean isCellEditable(int row, int column)
-    {
+
+    @Override
+    public boolean isCellEditable(final int row, final int column) {
         return model.isCellEditable(row, column);
     }
     //
     // Implementation of the TableModelListener interface,
     //
     // By default forward all events to all the listeners.
-    public void tableChanged(TableModelEvent e)
-    {
+    @Override
+    public void tableChanged(final TableModelEvent e) {
         fireTableChanged(e);
     }
 }

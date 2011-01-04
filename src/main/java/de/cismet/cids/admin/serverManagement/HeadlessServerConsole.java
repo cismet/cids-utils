@@ -254,8 +254,8 @@ public class HeadlessServerConsole {
          * miniatureServerPort   -s serverManagementRoot  -c miniatureServerConfig   -a cidsServerArgs1 cidsServerArgs2
          * ... referred to  :  cidsServ        cidsServ             ServerCon        MiniServ                 MiniServ
          * and ServerCon   MiniServ                   cidsServ needed by    :  ServerCon       ServerCon ServerCon
-         *  MiniServ                 MiniServ and ServerCon   MiniServ                   cidsServ
-         *                      optional         optional                 optional  optional                   optional
+         * MiniServ                 MiniServ and ServerCon   MiniServ                   cidsServ
+         * optional         optional                 optional  optional                   optional
          *
          * conditions: - parameter with switch -t must be the first, parameter with switch -n must be the second -
          * parameter with switch -a must be the last - if a configuration file of the cids server is specified, it must
@@ -636,6 +636,7 @@ public class HeadlessServerConsole {
             final KeyStroke configLoggerKeyStroke = KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK);
             final Action configAction = new AbstractAction() {
 
+                    @Override
                     public void actionPerformed(final ActionEvent e) {
                         java.awt.EventQueue.invokeLater(new Runnable() {
 
@@ -1094,7 +1095,7 @@ public class HeadlessServerConsole {
         try {
             if (serverLogFileName == null) {
                 logHtml = "LOGFILE NOT AVAILABLE, CHECK YOUR RUNTIME PROPERTIES"; // NOI18N
-            }else{
+            } else {
                 final File logfile = new File(serverLogFileName);
                 fileReader = new BufferedReader(new FileReader(logfile));
                 while ((line = fileReader.readLine()) != null) {
@@ -1116,7 +1117,7 @@ public class HeadlessServerConsole {
                         .log(java.util.logging.Level.SEVERE, null, ex);
             }
         }
-        
+
         return logHtml;
     }
 
@@ -1131,7 +1132,7 @@ public class HeadlessServerConsole {
 
                 @Override
                 public void run() {
-                    System.out.println("Server beenden!!!!!");
+                    System.out.println("Server beenden!");
                     con.shutdownServer();
                 }
             });
