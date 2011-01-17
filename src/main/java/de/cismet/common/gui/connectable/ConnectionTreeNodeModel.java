@@ -384,23 +384,23 @@ public class ConnectionTreeNodeModel extends DefaultConnectionModel {
      * ConnectionLink(dc_2.createPoint(), dc_1.createPoint());  //ctm.addLink(l_3);    final ConnectionLink l_4 = new
      * ConnectionLink(dc_3.createPoint(), dc_2.createPoint());  //ctm.addLink(l_4);    //ctm.removeLink(l_4);
      * //ctm.addLink(l_4);    System.out.println("l_1: " + l_1.getId());  System.out.println("l_4: " + l_4.getId());
-     *  System.out.println("dc_1.getLinkCount(): " + dc_1.getLinkCount());  System.out.println("dc_1.getTargetCount(): "
+     * System.out.println("dc_1.getLinkCount(): " + dc_1.getLinkCount());  System.out.println("dc_1.getTargetCount(): "
      * + dc_1.getTargetLinkCount());  System.out.println("dc_1.getSourceCount(): " + dc_1.getSourceLinkCount());
      * System.out.println("dc_3.getLinkCount(): " + dc_3.getLinkCount());  System.out.println("dc_3.getTargetCount(): "
      * + dc_3.getTargetLinkCount());  System.out.println("dc_3.getSourceCount(): " + dc_3.getSourceLinkCount());
      * //ctm.removeLink(l_1);        final DefaultTreeModel dtm = new DefaultTreeModel(ctm.getRootNode(), true);  final
      * JTree jt = new JTree(dtm);  jt.addTreeExpansionListener(new TreeExpansionListener()  {      public void
-     * treeCollapsed(TreeExpansionEvent event)      {}            public void treeExpanded(TreeExpansionEvent event)
-     *  {          Object object = event.getPath().getLastPathComponent();          if(object instanceof
-     * ConnectableTreeNode)          {              ((ConnectableTreeNode)object).explore();
+     * treeCollapsed(TreeExpansionEvent event)      {}            public void treeExpanded(TreeExpansionEvent event) {
+     *        Object object = event.getPath().getLastPathComponent();          if(object instanceof ConnectableTreeNode)
+     *          {              ((ConnectableTreeNode)object).explore();
      * dtm.nodeStructureChanged((ConnectableTreeNode)object);          }      }        });    final JButton jb1 = new
      * JButton("Remove Link");  jb1.addActionListener(new ActionListener()  {      public void
      * actionPerformed(ActionEvent e)      {          //ctm.removeLink(l_2);          //ctm.removeLink(0);,
      * ctm.addLink(l_4);          dtm.nodeChanged(ctm.getRootNode());          dtm.reload();      }  });    final
      * JButton jb2 = new JButton("Remo ve Node");  jb2.addActionListener(new ActionListener()  {      public void
      * actionPerformed(ActionEvent e)      {          //ctm.removeConnectable(1);          ctm.removeConnectable(dc_2);
-     *         dtm.nodeChanged(ctm.getRootNode());          dtm.reload();      }  });    JFrame jf = new JFrame("T
-     * est");  jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE);  jf.setSize(250, 600);  jf.setLocationRelativeTo(null);
+     *       dtm.nodeChanged(ctm.getRootNode());          dtm.reload();      }  });    JFrame jf = new JFrame("T est");
+     * jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE);  jf.setSize(250, 600);  jf.setLocationRelativeTo(null);
      * jf.getContentPane().setLayout(new BorderLayout());  jf.getContentPane().add(jt, BorderLayout.CENTER);
      * jf.getContentPane().add(jb1, BorderLayout.SOUTH);  jf.getContentPane().add(jb2, BorderLayout.NORTH);
      * jf.setVisible(true); }  static class DefaultConnectable extends AbstractConnectable {  public

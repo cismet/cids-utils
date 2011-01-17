@@ -57,8 +57,8 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   hell, oaltpeter, jfischer
  * @version  $Revision$, $Date$
  */
-public class ServerConsole extends javax.swing.JFrame {                                 // implements
-                                                                                        // SysTrayMenuListener{
+public class ServerConsole extends javax.swing.JFrame { // implements
+                                                        // SysTrayMenuListener{
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -242,10 +242,9 @@ public class ServerConsole extends javax.swing.JFrame {                         
          * command line parameters: parameter    :  -t serverType   -n serverClassName   -l log4jConfig   -p
          * miniatureServerPort   -s serverManagementRoot  -c miniatureServerConfig   -a cidsServerArgs1 cidsServerArgs2
          * ... referred to  :  cidsServ        cidsServ             ServerCon        MiniServ                 MiniServ
-         * and ServerCon   MiniServ                   cidsServ needed by    :  ServerCon       ServerCon
-         * ServerCon        MiniServ                 MiniServ and ServerCon   MiniServ                   cidsServ
-         *                                              optional         optional                 optional
-         *   optional                   optional
+         * and ServerCon   MiniServ                   cidsServ needed by    :  ServerCon       ServerCon ServerCon
+         *  MiniServ                 MiniServ and ServerCon   MiniServ                   cidsServ
+         *                      optional         optional                 optional  optional                   optional
          *
          * conditions: - parameter with switch -t must be the first, parameter with switch -n must be the second -
          * parameter with switch -a must be the last - if a configuration file of the cids server is specified, it must

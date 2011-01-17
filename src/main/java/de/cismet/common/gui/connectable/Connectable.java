@@ -97,7 +97,7 @@ public interface Connectable {
     /**
      * Returns all links, where this connectable is the source of the link.
      *
-     * <p>Same as getCildren.
+     * <p>Same as getCildren.</p>
      *
      * @return  DOCUMENT ME!
      */
@@ -111,7 +111,7 @@ public interface Connectable {
     /**
      * Returns all connectables, that are source of a link of this connectable.
      *
-     * <p>Same as getParents.
+     * <p>Same as getParents.</p>
      *
      * @return  DOCUMENT ME!
      */

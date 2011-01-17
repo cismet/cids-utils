@@ -30,6 +30,7 @@ import javax.swing.*;
  * @version  $Revision$, $Date$
  */
 public class CatalogSelectionBox extends JComboBox {
+
     //~ Static fields/initializers ---------------------------------------------
 
     // protected final Logger logger;

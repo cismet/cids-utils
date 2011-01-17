@@ -66,6 +66,7 @@ public class MessageArea extends JTextArea {
      * @version  $Revision$, $Date$
      */
     private class MessageAppender extends AppenderSkeleton {
+
         //~ Instance fields ----------------------------------------------------
 
         // private final PatternLayout layout;

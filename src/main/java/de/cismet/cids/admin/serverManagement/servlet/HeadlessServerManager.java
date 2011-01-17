@@ -371,9 +371,8 @@ public class HeadlessServerManager extends HttpServlet {
                     + "window.setTimeout(\"document.refreshFormular.submit();\", 5000);"
                     + "}\n"
                     + "//-->\n"
-                    + "</script>\n"
-                    +// "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssStylesheet + "\">" +
-                    "</HEAD>\n");
+                    + "</script>\n" // "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssStylesheet + "\">" +
+                    + "</HEAD>\n");
     }
 
     /**

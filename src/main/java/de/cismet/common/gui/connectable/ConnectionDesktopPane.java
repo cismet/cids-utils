@@ -141,24 +141,23 @@ public class ConnectionDesktopPane extends JDesktopPane {
      * DefaultTreeModel(ctm.getRootNode(), true); JTree jt = new JTree(dtm); jt.addTreeExpansionListener(new
      * TreeExpansionListener() {     public void treeCollapsed(TreeExpansionEvent event)     {}          public void
      * treeExpanded(TreeExpansionEvent event)     {         Object object = event.getPath().getLastPathComponent();
-     *    if(object instanceof ConnectionTreeNodeModel.ConnectableTreeNode)         {
-     * ((ConnectionTreeNodeModel.ConnectableTreeNode)object).explore();
-     * //dtm.nodeStructureChanged(ctm.getRootNode());
-     * dtm.nodeStructureChanged((ConnectionTreeNodeModel.ConnectableTreeNode)object);             //dtm.reload();
-     *  }     }      });   JInternalFrame jif = new JInternalFrame("Tree View", true, true, true, true);
-     * jif.setSize(200,400); jif.getContentPane().add(jt); jif.setVisible(true);  ConnectionDesktopPane cdp = new
-     * ConnectionDesktopPane(ctm); cdp.add(cf_1, cdp.DEFAULT_LAYER, 0); cdp.add(cf_2, cdp.DEFAULT_LAYER, 0);
-     * cdp.add(cf_3, cdp.DEFAULT_LAYER, 0); cdp.add(cf_4, cdp.DEFAULT_LAYER, 0); cdp.add(jif, cdp.PALETTE_LAYER);
-     * ConnectionLink l_1 = new ConnectionLink(cf_1.getConnectable().createPoint(),
-     * cf_2.getConnectable().createPoint()); ConnectionLink l_2 = new
-     * ConnectionLink(cf_3.getConnectable().createPoint(), cf_4.getConnectable().createPoint()); ConnectionLink l_3 =
-     * new ConnectionLink(cf_1.getConnectable().createPoint(), cf_4.getConnectable().createPoint()); ConnectionLink l_4
-     * = new ConnectionLink(cf_2.getConnectable().createPoint(), cf_4.getConnectable().createPoint()); ConnectionLink
-     * l_5 = new ConnectionLink(cf_1.getConnectable().createPoint(), cf_3.getConnectable().createPoint());
-     * ctm.addLink(l_1); ctm.addLink(l_2); ctm.addLink(l_3); ctm.addLink(l_4); ctm.addLink(l_5);  //JInternalFrame jif =
-     * new JInternalFrame("Blah"); //jif.getContentPane().add(new JButton("Blah!")); //cdp.add(jif );
-     * //jif.setVisible(true); //jif.setSize(200,300);  JFrame jf = new JFrame("ConnectorPane Test Frame");
-     * jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE); jf.setSize(640, 480); jf.setLocationRelativeTo(null);
-     * jf.getContentPane().setLayout(new BorderLayout()); jf.getContentPane().add(cdp, BorderLayout.CENTER);
+     * if(object instanceof ConnectionTreeNodeModel.ConnectableTreeNode)         {
+     * ((ConnectionTreeNodeModel.ConnectableTreeNode)object).explore(); //dtm.nodeStructureChanged(ctm.getRootNode());
+     * dtm.nodeStructureChanged((ConnectionTreeNodeModel.ConnectableTreeNode)object);             //dtm.reload(); }
+     * }      });   JInternalFrame jif = new JInternalFrame("Tree View", true, true, true, true); jif.setSize(200,400);
+     * jif.getContentPane().add(jt); jif.setVisible(true);  ConnectionDesktopPane cdp = new ConnectionDesktopPane(ctm);
+     * cdp.add(cf_1, cdp.DEFAULT_LAYER, 0); cdp.add(cf_2, cdp.DEFAULT_LAYER, 0); cdp.add(cf_3, cdp.DEFAULT_LAYER, 0);
+     * cdp.add(cf_4, cdp.DEFAULT_LAYER, 0); cdp.add(jif, cdp.PALETTE_LAYER); ConnectionLink l_1 = new
+     * ConnectionLink(cf_1.getConnectable().createPoint(), cf_2.getConnectable().createPoint()); ConnectionLink l_2 =
+     * new ConnectionLink(cf_3.getConnectable().createPoint(), cf_4.getConnectable().createPoint()); ConnectionLink l_3
+     * = new ConnectionLink(cf_1.getConnectable().createPoint(), cf_4.getConnectable().createPoint()); ConnectionLink
+     * l_4 = new ConnectionLink(cf_2.getConnectable().createPoint(), cf_4.getConnectable().createPoint());
+     * ConnectionLink l_5 = new ConnectionLink(cf_1.getConnectable().createPoint(),
+     * cf_3.getConnectable().createPoint()); ctm.addLink(l_1); ctm.addLink(l_2); ctm.addLink(l_3); ctm.addLink(l_4);
+     * ctm.addLink(l_5);  //JInternalFrame jif = new JInternalFrame("Blah"); //jif.getContentPane().add(new
+     * JButton("Blah!")); //cdp.add(jif ); //jif.setVisible(true); //jif.setSize(200,300);  JFrame jf = new
+     * JFrame("ConnectorPane Test Frame"); jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE); jf.setSize(640, 480);
+     * jf.setLocationRelativeTo(null); jf.getContentPane().setLayout(new BorderLayout()); jf.getContentPane().add(cdp,
+     * BorderLayout.CENTER);
      * dtm.nodeStructureChanged(ctm.getRootNode()); jf.setVisible(true);      } */
 }

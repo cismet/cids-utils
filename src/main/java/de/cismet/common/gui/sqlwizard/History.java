@@ -20,7 +20,7 @@ package de.cismet.common.gui.sqlwizard;
  */
 public interface History {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     String SELECTED_HISTORY_ENTRY = "selectedHistoryEntry";
 

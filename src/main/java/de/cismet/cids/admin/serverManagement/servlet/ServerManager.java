@@ -166,17 +166,17 @@ public class ServerManager extends HttpServlet {
     }
 
     /*private void killServer(PrintWriter out) {
-     *  if (serverCon.isServerRunning()) {     out.println("<script type=\"text/javascript\">\n" + "<!--\n" +
-     *      "Check = confirm(\"Der Serverprozess l&auml;uft noch! Wenn Sie das Servermanagement jetzt beenden, wird der
-     * Server evtl. nicht ordnungsgem&auml;&szlig; heruntergefahren.\\nDiese Managementkonsole wird auch beendet
-     * werden!\\nWollen Sie das Servermanagement trotzdem beenden?\");\n" +                 "if (Check == true) {\n" +
-     *                   "window.open(\"http://" + serverIP + ":" + httpPort + "/cidsservermanager?server=kill-now\",
-     * \"_self\");\n" +                 "};\n" +                 "//-->\n" +           "</script>\n"); } if
-     * (!serverCon.isServerRunning()) {     out.println("<script type=\"text/javascript\">\n" +                 "<!--\n"
-     * +                 "Check = confirm(\"\\nWenn Sie das Servermanagement beenden, wird auch diese Managementkonsole
-     * beendet werden!\\nWollen Sie das Servermanagement wirklich beenden?\");\n" +                 "if (Check == true)
-     * {\n" +                     "window.open(\"http://" + serverIP + ":" + httpPort +
-     * "cidsservermanager?server=kill-now\", \"_self\");\n" +                 "};\n" +
+     *  if (serverCon.isServerRunning()) {     out.println("<script type=\"text/javascript\">\n" + "<!--\n" +     "Check
+     * = confirm(\"Der Serverprozess l&auml;uft noch! Wenn Sie das Servermanagement jetzt beenden, wird der Server evtl.
+     * nicht ordnungsgem&auml;&szlig; heruntergefahren.\\nDiese Managementkonsole wird auch beendet werden!\\nWollen Sie
+     * das Servermanagement trotzdem beenden?\");\n" +                 "if (Check == true) {\n" +
+     * "window.open(\"http://" + serverIP + ":" + httpPort + "/cidsservermanager?server=kill-now\", \"_self\");\n" +
+     *             "};\n" +                 "//-->\n" +           "</script>\n"); } if (!serverCon.isServerRunning()) {
+     *    out.println("<script type=\"text/javascript\">\n" +                 "<!--\n" +                 "Check =
+     * confirm(\"\\nWenn Sie das Servermanagement beenden, wird auch diese Managementkonsole beendet werden!\\nWollen
+     * Sie das Servermanagement wirklich beenden?\");\n" +                 "if (Check == true) {\n" +
+     *  "window.open(\"http://" + serverIP + ":" + httpPort + "cidsservermanager?server=kill-now\", \"_self\");\n" +
+     *             "};\n" +
      *             "//-->\n" +                 "</script>\n"); }}*/
 
     /*private void killServerNow() {
@@ -411,9 +411,8 @@ public class ServerManager extends HttpServlet {
                     + "window.setTimeout(\"document.refreshFormular.submit();\", 5000);"
                     + "}\n"
                     + "//-->\n"
-                    + "</script>\n"
-                    +// "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssStylesheet + "\">" +
-                    "</HEAD>\n");
+                    + "</script>\n" // "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssStylesheet + "\">" +
+                    + "</HEAD>\n");
     }
 
     /**

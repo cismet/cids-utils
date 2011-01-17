@@ -28,6 +28,7 @@ import javax.swing.table.*;
  */
 public class ResultSetTable extends JTable // implements HistorySupport
 {
+
     //~ Instance fields --------------------------------------------------------
 
     // private LinkedList history;
@@ -173,12 +174,12 @@ public class ResultSetTable extends JTable // implements HistorySupport
 
     /*private void addHistoryEntry(int index)
      * { if(index == -1) {     if(this.maxHistorySize > 0)     {         if(this.history.size() == this.maxHistorySize)
-     *        {             this.history.removeFirst();         }
+     *      {             this.history.removeFirst();         }
      *
-     *       this.history.add(this.tableSorter.getModel());         this.selectedIndex = this.history.size()-1;     } }
+     *    this.history.add(this.tableSorter.getModel());         this.selectedIndex = this.history.size()-1;     } }
      * else {     if(this.maxHistorySize > 0)     {         if(index <= this.history.size())         {             int i
      * = this.history.size();             for(; i <= index; i++)             {                 this.history.add(null);
-     *           }         }                  this.history.set(index, this.tableSorter.getModel());
+     *        }         }                  this.history.set(index, this.tableSorter.getModel());
      * this.selectedIndex = index;     } }}*/
 
     /**

@@ -110,9 +110,9 @@ public class LazyPanel extends JPanel {
      * lazyPanel.setPreferredSize(new Dimension(320,240));    JPanel panel = new JPanel(new GridLayout(1,2));    JButton
      * lazyButton = new JButton("Lazy Button 1");  lazyButton.addActionListener(new ActionListener()  {      public void
      * actionPerformed(ActionEvent e)      {          lazyPanel.blockEvents(true);      }  });    panel.add(lazyButton);
-     *  panel.add(new JButton("Lazy Button 2"));  JPanel content = new JPanel(new BorderLayout());
-     * content.add(lazyPanel, BorderLayout.CENTER);  content.add(new JButton("Button"),  BorderLayout.SOUTH);
-     * content.add(new JButton("Button"),  BorderLayout.NORTH);  lazyPanel.setContent(panel);
-     * testFrame.setContentPane(content);    //testFrame.setPreferredSize(320,240);  testFrame.pack();
+     * panel.add(new JButton("Lazy Button 2"));  JPanel content = new JPanel(new BorderLayout()); content.add(lazyPanel,
+     * BorderLayout.CENTER);  content.add(new JButton("Button"),  BorderLayout.SOUTH); content.add(new
+     * JButton("Button"),  BorderLayout.NORTH);  lazyPanel.setContent(panel); testFrame.setContentPane(content);
+     * //testFrame.setPreferredSize(320,240);  testFrame.pack();
      * testFrame.setVisible(true);            // lazyPanel.blockEvents(true); }*/
 }

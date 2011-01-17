@@ -224,8 +224,8 @@ class LazyGlassPane extends JComponent {
 
     /*
      * class FocusThread extends Thread { public void run() {     LazyGlassPane.this.requestFocus();
-     * //System.out.println("[FocusThread] start");     SwingUtilities.invokeLater(new Runnable()         {
-     *    public void run()                 {                         //System.out.println("[invokeLater] start");
-     *       LazyGlassPane.this.requestFocus();             //System.out.println("[invokeLater] stop");
+     * //System.out.println("[FocusThread] start");     SwingUtilities.invokeLater(new Runnable()         {   public
+     * void run()                 {                         //System.out.println("[invokeLater] start");
+     * LazyGlassPane.this.requestFocus();             //System.out.println("[invokeLater] stop");
      * }         });     //System.out.println("[FocusThread] stop"); }}*/
 }
