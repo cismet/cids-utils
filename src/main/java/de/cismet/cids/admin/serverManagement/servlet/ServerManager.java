@@ -171,12 +171,12 @@ public class ServerManager extends HttpServlet {
      * nicht ordnungsgem&auml;&szlig; heruntergefahren.\\nDiese Managementkonsole wird auch beendet werden!\\nWollen Sie
      * das Servermanagement trotzdem beenden?\");\n" +                 "if (Check == true) {\n" +
      * "window.open(\"http://" + serverIP + ":" + httpPort + "/cidsservermanager?server=kill-now\", \"_self\");\n" +
-     *             "};\n" +                 "//-->\n" +           "</script>\n"); } if (!serverCon.isServerRunning()) {
-     *    out.println("<script type=\"text/javascript\">\n" +                 "<!--\n" +                 "Check =
+     *        "};\n" +                 "//-->\n" +           "</script>\n"); } if (!serverCon.isServerRunning()) {
+     * out.println("<script type=\"text/javascript\">\n" +                 "<!--\n" +                 "Check =
      * confirm(\"\\nWenn Sie das Servermanagement beenden, wird auch diese Managementkonsole beendet werden!\\nWollen
      * Sie das Servermanagement wirklich beenden?\");\n" +                 "if (Check == true) {\n" +
-     *  "window.open(\"http://" + serverIP + ":" + httpPort + "cidsservermanager?server=kill-now\", \"_self\");\n" +
-     *             "};\n" +
+     * "window.open(\"http://" + serverIP + ":" + httpPort + "cidsservermanager?server=kill-now\", \"_self\");\n" +
+     *       "};\n" +
      *             "//-->\n" +                 "</script>\n"); }}*/
 
     /*private void killServerNow() {

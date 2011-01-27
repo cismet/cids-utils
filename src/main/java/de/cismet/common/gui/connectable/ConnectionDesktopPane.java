@@ -143,8 +143,8 @@ public class ConnectionDesktopPane extends JDesktopPane {
      * treeExpanded(TreeExpansionEvent event)     {         Object object = event.getPath().getLastPathComponent();
      * if(object instanceof ConnectionTreeNodeModel.ConnectableTreeNode)         {
      * ((ConnectionTreeNodeModel.ConnectableTreeNode)object).explore(); //dtm.nodeStructureChanged(ctm.getRootNode());
-     * dtm.nodeStructureChanged((ConnectionTreeNodeModel.ConnectableTreeNode)object);             //dtm.reload(); }
-     * }      });   JInternalFrame jif = new JInternalFrame("Tree View", true, true, true, true); jif.setSize(200,400);
+     * dtm.nodeStructureChanged((ConnectionTreeNodeModel.ConnectableTreeNode)object);             //dtm.reload(); } }
+     *   });   JInternalFrame jif = new JInternalFrame("Tree View", true, true, true, true); jif.setSize(200,400);
      * jif.getContentPane().add(jt); jif.setVisible(true);  ConnectionDesktopPane cdp = new ConnectionDesktopPane(ctm);
      * cdp.add(cf_1, cdp.DEFAULT_LAYER, 0); cdp.add(cf_2, cdp.DEFAULT_LAYER, 0); cdp.add(cf_3, cdp.DEFAULT_LAYER, 0);
      * cdp.add(cf_4, cdp.DEFAULT_LAYER, 0); cdp.add(jif, cdp.PALETTE_LAYER); ConnectionLink l_1 = new
