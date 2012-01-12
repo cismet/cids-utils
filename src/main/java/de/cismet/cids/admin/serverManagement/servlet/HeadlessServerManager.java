@@ -240,7 +240,7 @@ public class HeadlessServerManager extends HttpServlet {
                     // Show the main app
                     printServerManager(request, response, out);
                 } else {
-                    printLogin(out, "Die Anmeldung ist fehlgeschlagen.");
+                    printLogin(out, "Die Anmeldung ist fehlgeschlagen..");
                 }
             } else {
                 // No validation in progress, thus show login

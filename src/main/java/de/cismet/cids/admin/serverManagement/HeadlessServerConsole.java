@@ -63,28 +63,20 @@ public class HeadlessServerConsole {
     public static final long MILLISECONDS_DAY = 86400000;
     /** Number of milliseconds for 1 week. */
     public static final long MILLISECONDS_WEEK = 604800000;
-
     protected static final int START_HELP_FILE = 1;
     protected static final int MAIN_HELP_FILE = 2;
-
     protected static final String DEFAULT_MINIATURE_SERVER_PORT = "82";
     protected static Boolean startsWithGui = false;
-
     protected static HeadlessServerConsole instance;
-
     protected static String serverManagementRoot = null;
     protected static File cidsServerConfigFile = null;
-
     protected static boolean startMiniatureServer = true;
     protected static StringBuffer logStringBuffer = new StringBuffer();
-
     protected static MyPrintStream mySysOut;
     protected static MyPrintStream mySysErr;
-
     static SimpleAttributeSet STANDARD = new SimpleAttributeSet();
     static SimpleAttributeSet INFO = new SimpleAttributeSet();
     static SimpleAttributeSet ERROR = new SimpleAttributeSet();
-
 //    protected String serverLogFileName;
     static Logger logger;
 
@@ -99,22 +91,16 @@ public class HeadlessServerConsole {
     protected Class serverClass = null;
     protected JTextPane theGuiComponent = null;
     protected ServerConsoleGui theGuiFrame = null;
-
 //     protected HashMap miniatureServerArgs = null;
-
     protected String serverType = null;
     protected String log4jConfig = "default";
     protected String miniatureServerPort = null;
     protected String miniatureServerConfig = "default";
     protected String serverLogFileName;
-
     protected long serverStartTime = -1;
-
     protected SimpleWebServer minuatureServerInstance = null;
-
     protected File logOutputDirectory;
     protected File workpath = null;
-
     FileEditor fileEditor = null;
     private Properties runtimeProperties;
 
@@ -250,12 +236,10 @@ public class HeadlessServerConsole {
         /*
          * Read in the command line parameters into a Hashmap (switch, parameter)
          *
-         * command line parameters: parameter    :  -t serverType   -n serverClassName   -l log4jConfig   -p
-         * miniatureServerPort   -s serverManagementRoot  -c miniatureServerConfig   -a cidsServerArgs1 cidsServerArgs2
-         * ... referred to  :  cidsServ        cidsServ             ServerCon        MiniServ                 MiniServ
-         * and ServerCon   MiniServ                   cidsServ needed by    :  ServerCon       ServerCon ServerCon
-         * MiniServ                 MiniServ and ServerCon   MiniServ                   cidsServ optional optional
-         *           optional  optional                   optional
+         * command line parameters: parameter : -t serverType -n serverClassName -l log4jConfig -p miniatureServerPort -s
+         * serverManagementRoot -c miniatureServerConfig -a cidsServerArgs1 cidsServerArgs2 ... referred to : cidsServ
+         * cidsServ ServerCon MiniServ MiniServ and ServerCon MiniServ cidsServ needed by : ServerCon ServerCon
+         * ServerCon MiniServ MiniServ and ServerCon MiniServ cidsServ optional optional optional optional optional
          *
          * conditions: - parameter with switch -t must be the first, parameter with switch -n must be the second -
          * parameter with switch -a must be the last - if a configuration file of the cids server is specified, it must
@@ -399,8 +383,8 @@ public class HeadlessServerConsole {
             System.out.println("Parameter log4jFile wurde nicht angegeben.");
         }
 
-        /* If there's no valid port information,
-         * the default port is used.
+        /*
+         * If there's no valid port information, the default port is used.
          */
         if (parameter.get("miniatureServerPort") != null) {
             if (parameter.get("miniatureServerPort") != null) {
@@ -449,9 +433,10 @@ public class HeadlessServerConsole {
                         .getString("Fuer_den_cids_Server_wurden_keine_Parameter_angegeben"));
         }
 
-        /*System.out.println("serverArgs.length: " + serverArgs.length);
-         * for (int i=0; i < serverArgs.length; ) { System.out.println("serverArgs[" + i + "]: " + serverArgs[i]);
-         * ++i;}*/
+        /*
+         * System.out.println("serverArgs.length: " + serverArgs.length); for (int i=0; i < serverArgs.length; ) {
+         * System.out.println("serverArgs[" + i + "]: " + serverArgs[i]); ++i;}
+         */
 
         /*
          * Initialise log4j with the given or with a standard properties file.
@@ -585,14 +570,12 @@ public class HeadlessServerConsole {
 // //serverProperties.getString("SessionTimeOutInMinutesOption"),
 // //serverProperties.getString("SessionTimeOutInMinutesValue")
 // };
-
 ////            // miniatureServerArgs = new HashMap();
                 // TODO entfernen
 //                System.out.println("JF: " + workpath.toString());
 //                miniatureServerArgs.put(Serve.ARG_ALIASES,  serverProperties.getString("AliasesDefinitionFile_value") );
 //                miniatureServerArgs.put(Serve.ARG_SERVLETS, serverProperties.getString("ServletPropertiesFile_value") );
 //                miniatureServerArgs.put(Serve.ARG_PORT, new Integer(miniatureServerPort) );
-
             } catch (Throwable e) {
                 logger.fatal(java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources")
                             .getString("Fehler_beim_Einlesen_der_Konfigurationsparameter_fuer_den_MiniServer"),
@@ -866,10 +849,11 @@ public class HeadlessServerConsole {
     public boolean validateUser(final String userGroupName, final String userName, final String password) {
         boolean ret = false;
 
-        final String adminPassword = "xxx";
+        final String adminPassword = "gibtskeins";
 
         try {
-            /* Method only available with the server type "domain server"
+            /*
+             * Method only available with the server type "domain server"
              * (Sirius.server.middleware.impls.domainserver.DomainServerImpl)
              *
              * wenn proxy: benutzername=admin, usergroup=proxy, pass=xxx Sirius.server.middleware.impls.proxy.StartProxy
@@ -888,7 +872,7 @@ public class HeadlessServerConsole {
                         "validateUser",
                         new Class[] { User.class, String.class });
                 final Boolean refRet = (Boolean)validateUser.invoke(serverInstance, new Object[] { user, password });
-                ret = refRet.booleanValue();
+                ret = refRet.booleanValue() && isUserAdmin(userName);
             } else if (serverInstance instanceof Sirius.server.middleware.impls.proxy.StartProxy) {
 //                if( userGroupName.equals("proxy") && userName.equals("admin") && password.equals(adminPassword)) {
                 if (userName.equals("admin") && password.equals(adminPassword)) {
@@ -908,13 +892,7 @@ public class HeadlessServerConsole {
             System.err.println("\nBeim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.!!!\n");
             logger.fatal("Beim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.", t);
         }
-
-        if (isUserAdmin(userName)) {
-            return ret;
-        } else {
-            System.err.println("Der User verfügt nicht über die benötigten Adminrechte");
-            return false;
-        }
+        return ret;
     }
 
     /**
@@ -1096,7 +1074,7 @@ public class HeadlessServerConsole {
             if (serverLogFileName == null) {
                 logHtml = "LOGFILE NOT AVAILABLE, CHECK YOUR RUNTIME PROPERTIES"; // NOI18N
             } else {
-                final File logfile = new File(serverLogFileName);
+                final File logfile = new File(serverLogFileName.trim());
                 fileReader = new BufferedReader(new FileReader(logfile));
                 while ((line = fileReader.readLine()) != null) {
                     logHtml += (line + "\n");

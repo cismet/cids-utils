@@ -243,8 +243,8 @@ public class ServerConsole extends javax.swing.JFrame { // implements
          * miniatureServerPort   -s serverManagementRoot  -c miniatureServerConfig   -a cidsServerArgs1 cidsServerArgs2
          * ... referred to  :  cidsServ        cidsServ             ServerCon        MiniServ                 MiniServ
          * and ServerCon   MiniServ                   cidsServ needed by    :  ServerCon       ServerCon ServerCon
-         * MiniServ                 MiniServ and ServerCon   MiniServ                   cidsServ
-         * optional         optional                 optional  optional                   optional
+         * MiniServ                 MiniServ and ServerCon   MiniServ                   cidsServ optional optional
+         * optional  optional                   optional
          *
          * conditions: - parameter with switch -t must be the first, parameter with switch -n must be the second -
          * parameter with switch -a must be the last - if a configuration file of the cids server is specified, it must

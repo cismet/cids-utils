@@ -391,19 +391,18 @@ public class ConnectionTreeNodeModel extends DefaultConnectionModel {
      * //ctm.removeLink(l_1);        final DefaultTreeModel dtm = new DefaultTreeModel(ctm.getRootNode(), true);  final
      * JTree jt = new JTree(dtm);  jt.addTreeExpansionListener(new TreeExpansionListener()  {      public void
      * treeCollapsed(TreeExpansionEvent event)      {}            public void treeExpanded(TreeExpansionEvent event) {
-     *     Object object = event.getPath().getLastPathComponent();          if(object instanceof ConnectableTreeNode)
-     *      {              ((ConnectableTreeNode)object).explore();
-     * dtm.nodeStructureChanged((ConnectableTreeNode)object);          }      }        });    final JButton jb1 = new
-     * JButton("Remove Link");  jb1.addActionListener(new ActionListener()  {      public void
-     * actionPerformed(ActionEvent e)      {          //ctm.removeLink(l_2);          //ctm.removeLink(0);,
-     * ctm.addLink(l_4);          dtm.nodeChanged(ctm.getRootNode());          dtm.reload();      }  });    final
-     * JButton jb2 = new JButton("Remo ve Node");  jb2.addActionListener(new ActionListener()  {      public void
-     * actionPerformed(ActionEvent e)      {          //ctm.removeConnectable(1);          ctm.removeConnectable(dc_2);
-     *     dtm.nodeChanged(ctm.getRootNode());          dtm.reload();      }  });    JFrame jf = new JFrame("T est");
-     * jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE);  jf.setSize(250, 600);  jf.setLocationRelativeTo(null);
+     * Object object = event.getPath().getLastPathComponent();          if(object instanceof ConnectableTreeNode)     {
+     *            ((ConnectableTreeNode)object).explore(); dtm.nodeStructureChanged((ConnectableTreeNode)object);    }
+     *    }        });    final JButton jb1 = new JButton("Remove Link");  jb1.addActionListener(new ActionListener()  {
+     *      public void actionPerformed(ActionEvent e)      {          //ctm.removeLink(l_2);  //ctm.removeLink(0);,
+     * ctm.addLink(l_4);          dtm.nodeChanged(ctm.getRootNode());          dtm.reload(); }  });    final JButton jb2
+     * = new JButton("Remo ve Node");  jb2.addActionListener(new ActionListener()  { public void
+     * actionPerformed(ActionEvent e)      {          //ctm.removeConnectable(1); ctm.removeConnectable(dc_2);
+     * dtm.nodeChanged(ctm.getRootNode());          dtm.reload();      }  });    JFrame jf = new JFrame("T est");
+     * jf.setDefaultCloseOperation(jf.EXIT_ON_CLOSE);  jf.setSize(250, 600); jf.setLocationRelativeTo(null);
      * jf.getContentPane().setLayout(new BorderLayout());  jf.getContentPane().add(jt, BorderLayout.CENTER);
      * jf.getContentPane().add(jb1, BorderLayout.SOUTH);  jf.getContentPane().add(jb2, BorderLayout.NORTH);
-     * jf.setVisible(true); }  static class DefaultConnectable extends AbstractConnectable {  public
+     * jf.setVisible(true); }  static class DefaultConnectable extends AbstractConnectable { public
      * DefaultConnectable(String name)  {      super(name);  }
      *
      * public de.cismet.common.gui.connectable.ConnectionPoint createPoint()  {      return new ConnectionPoint(this,
