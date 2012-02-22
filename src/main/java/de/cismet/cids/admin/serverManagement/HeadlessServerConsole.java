@@ -719,6 +719,7 @@ public class HeadlessServerConsole {
         try {
             minuatureServerInstance = new SimpleWebServer(Integer.parseInt(miniatureServerPort));
             minuatureServerInstance.start();
+            logger.info("web server port: " + miniatureServerPort);
         } catch (Throwable e) {
             logger.error("Fehler beim Starten des WebServers", e);
         }

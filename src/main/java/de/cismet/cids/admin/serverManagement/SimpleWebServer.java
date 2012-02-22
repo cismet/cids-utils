@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.cids.admin.serverManagement;
 
+import com.sun.jersey.spi.container.servlet.ServletContainer;
+
 import org.apache.log4j.Logger;
 
 import org.mortbay.jetty.Handler;
@@ -18,9 +20,7 @@ import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-import de.cismet.cids.admin.serverManagement.servlet.FileEditorServlet;
-import de.cismet.cids.admin.serverManagement.servlet.ServerLogFile;
-import de.cismet.cids.admin.serverManagement.servlet.ServerManager;
+import java.util.HashMap;
 
 /**
  * DOCUMENT ME!
@@ -73,33 +73,39 @@ public class SimpleWebServer {
         // Create an instance of the jetty server
         server = new Server(port);
 
+        final String resoursceBaseDir = this.getClass()
+                    .getClassLoader()
+                    .getResource("de/cismet/cids/admin/serverManagement/webserverroot")
+                    .toExternalForm();
+
         final Context rootContext = new Context(server, "/", Context.SESSIONS); // NOI18N
-        rootContext.setResourceBase("webinterface");                            // NOI18N
         rootContext.setHandler(new ResourceHandler());
+//        rootContext.setResourceBase("webinterface");                            // NOI18N
+        rootContext.setResourceBase(resoursceBaseDir);                          // NOI18N
 
-        final Context editorContext = new Context(server, "/fe", Context.SESSIONS); // NOI18N
-        final ServletHolder editorHolder = new ServletHolder(new FileEditorServlet());
-        editorContext.addServlet(editorHolder, "/fileeditor");                      // NOI18N
+        final HashMap map = new HashMap<String, String>();
+        map.put("org.mortbay.jetty.servlet.SessionCookie", "XSESSIONID" + port);
+        map.put("org.mortbay.jetty.servlet.SessionURL", "xsessionid");
 
+        final ServletHolder servlet = new ServletHolder(ServletContainer.class);
+
+        servlet.setInitParameter(
+            "com.sun.jersey.config.property.resourceConfigClass",
+            "com.sun.jersey.api.core.PackagesResourceConfig");
+        servlet.setInitParameter(
+            "com.sun.jersey.config.property.packages",
+            "de.cismet.cids.admin.serverManagement.servlet");
         final Context managerContext = new Context(server, "/", Context.SESSIONS); // NOI18N
-        final ServletHolder managerHolder = new ServletHolder(new ServerManager());
-        managerContext.addServlet(managerHolder, "/cidsservermanager");            // NOI18N
-
-        final Context logContext = new Context(server, "/lf", Context.SESSIONS); // NOI18N
-        final ServletHolder logHolder = new ServletHolder(new ServerLogFile());
-        logContext.addServlet(logHolder, "/serverlogfile");                      // NOI18N
-
-        final Context imageContext = new Context(server, "/img", Context.SESSIONS); // NOI18N
-        imageContext.setResourceBase("webinterface/img");                           // NOI18N
-        imageContext.setHandler(new ResourceHandler());
-
-        final Context logResourceContext = new Context(server, "/log", Context.SESSIONS); // NOI18N
-        logResourceContext.setResourceBase("webinterface");                               // NOI18N
-        logResourceContext.setHandler(new ResourceHandler());
+        managerContext.setResourceBase(resoursceBaseDir);
+        managerContext.addServlet(servlet, "/");
+        managerContext.setInitParams(map);                                         // NOI18N
 
         final ContextHandlerCollection contexts = new ContextHandlerCollection();
         contexts.setHandlers(
-            new Handler[] { rootContext, managerContext, editorContext, logContext, imageContext, logResourceContext });
+            new Handler[] {
+                rootContext,
+                managerContext,
+            });
 
         final HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] { contexts, new DefaultHandler() });

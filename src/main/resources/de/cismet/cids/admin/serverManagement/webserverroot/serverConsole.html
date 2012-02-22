@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>cismet Server Management Console</title>
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+        <!--[if lt IE 9]>
+          <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <!-- Le styles -->
+        <link href="/css/bootstrap.css" rel="stylesheet">
+        <style type="text/css">
+            /* Override some defaults */
+            html, body {
+                background-color: #eee;
+            }
+            body {
+                /*                40px to make the container go all the way to the bottom of the topbar */
+                padding-top: 40px;  
+            }
+
+            .container > footer p {
+                /* center align it with the container */
+                text-align: center; 
+            }
+
+            .container {
+                /* downsize our container to make the content feel a bit tighter and more cohesive. NOTE: this removes two full columns from the grid, meaning you only go to 14 columns and not 16. */
+                width: 820px;  
+            }
+
+            /* The white background content wrapper */
+            .container > .content {
+                background-color: #fff;
+                padding: 20px;
+                /* negative indent the amount of the padding to maintain the grid system */
+                margin: 0 -30px;  
+                -webkit-border-radius: 0 0 6px 6px;
+                -moz-border-radius: 0 0 6px 6px;
+                border-radius: 0 0 6px 6px;
+                -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+                -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+                box-shadow: 0 1px 2px rgba(0,0,0,.15);
+            }
+
+            /* Page header tweaks */
+            .page-header {
+                background-color: #f5f5f5;
+                padding: 20px 20px 10px;
+                margin: -20px -20px 20px;
+            }
+
+
+            /* Give a quick and non-cross-browser friendly divider */
+            .content .span4 {
+                margin-left: 0;
+                padding-left: 19px;
+                border-left: 1px solid #eee;
+            }
+
+            .navbar .btn {
+                border: 0;
+            }
+
+            a.unreachable{
+                color:#aaaaaa;
+            }
+
+            a.unreachable:hover{
+                background-color:#ffffff;
+            }
+
+        </style>
+
+
+        <!-- Le fav and touch icons -->
+        <!--        <link rel="shortcut icon" href="images/favicon.ico">
+                <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+                <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+                <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">-->
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script src="/js/bootstrap-modal.js"></script>
+        <script src="/js/bootstrap-dropdown.js"></script>
+        <script src="/js/bootstrap-tooltip.js"></script>
+        <script src="/js/bootstrap-popover.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.0/dojo/dojo.xd.js"
+                data-dojo-config="isDebug: true,parseOnLoad: true">
+        </script>
+
+        <script>
+            var oldScrollDivHeight=0;
+            var oldScrollTop=0;
+            var autoscrollMode = true;
+        
+            //load the serverconsole output every second.... 
+            function timer(){
+				
+                var t = setTimeout("timer()",1000);
+                refreshContent();
+                var scrollDiv = dojo.byId("contentNode");
+                //                console.info(scrollDiv);
+                if(scrollDiv.scrollHeight > oldScrollDivHeight){
+                    oldScrollDivHeight = scrollDiv.scrollHeight;
+                    if(scrollDiv.scrollTop >= oldScrollTop){
+                        scrollDiv.scrollTop = scrollDiv.scrollHeight;
+                        oldScrollTop = scrollDiv.scrollTop;
+                    }
+                }
+            }
+			
+            // Function that refreshes server log file in the SPAN node
+            function refreshContent() {
+				
+                // Using dojo.xhrGet, as very little information is being sent
+                dojo.xhrGet({
+                    // The URL of the request
+                    url: "/cidsservermanager/serverConsole",
+                    //url: "/log/logOutput82.htm",
+                    // The success callback with result from server
+                    load: function(consoleContent) {
+                        dojo.byId("contentNode").innerHTML = consoleContent;
+                    },
+                    // The error handler
+                    error: function() {
+                        // Do nothing -- keep old content there
+                    },
+                    // generate an extra GET variable to prevent browsers from caching
+                    preventCache: true
+                });
+            }
+			
+            //function that load runtime properties in editor modal
+            function loadRuntimeProperties(){
+			
+                var s = dojo.byId("runtimePropsButton").attributes[0].nodeValue;
+				
+                if(s.indexOf("disabled") >= 0)
+                {
+                    console.info("edit config file button is disabled");
+                }else{
+                    // Using dojo.xhrGet, as very little information is being sent
+                    dojo.xhrGet({
+                        // The URL of the request
+                        //url: "http://localhost/bootstrap/examples/runtime.properties",
+                        url: "/cidsservermanager/runtime.properties",
+                        // The success callback with result from server
+                        load: function(runtimePropsText) {
+                            console.info(runtimePropsText);
+                            dojo.byId("runtimePropsTextArea").innerHTML = runtimePropsText;
+                        },
+                        // The error handler
+                        error: function() {
+                            // Do nothing -- keep old content there
+                        },
+                        // generate an extra GET variable to prevent browsers from caching
+                        preventCache: true
+                    });
+                }
+            }
+			
+            function closeModal(){
+                $('#editConfigFileModal').modal('hide');
+            }
+			
+            function saveRuntimeProperties(){
+                var s = dojo.byId("saveRuntimePropsButton").attributes[0].nodeValue;
+				
+                if(s.indexOf("disabled") >= 0)
+                {
+                    console.info("saveRuntimePropsButton is disabled");
+                }else{
+                    dojo.xhrPost({
+                        url:"cidsservermanager/saveRuntimeProps",
+                        //url:"foo",
+                        form:dojo.byId("runtimePropertiesForm"),
+                        handleAs:"text",
+                        load: function(){
+                            console.info("saving runtime properties successfull")
+                        },
+                        error: function(error){
+                            alert("error during saving runtime props" + error);
+                        }
+                    });
+                    $('#editConfigFileModal').modal('hide');
+                }
+            }
+			
+            function stopServer(){
+                var s = dojo.byId("stopServerButton").attributes[0].nodeValue;
+				
+                if(s.indexOf("disabled") >= 0)
+                {
+                    console.info("stopServer button is disabled");
+                }else{
+                    dojo.xhrPost({
+                        url:"cidsservermanager/",
+                        //url:"foo",
+                        postData:"server=stop",
+                        handleAs:"text",
+                        load: function(){
+                            console.info("post server stop")
+                            //console.info(foo);
+                        },
+                        error: function(error){
+                            alert("error server stop" + error);
+                        }
+                    });
+                }
+            }
+            
+            function loginOnEnter(event){
+                if(event.keyCode == dojo.keys.ENTER){
+                    login();
+                }
+            }
+            
+            function login(){
+                console.debug("sending login form");
+                dojo.xhrPost({
+                    url:"cidsservermanager/login",
+                    //url:"foo",
+                    form:dojo.byId("signInForm"),
+                    handleAs:"text",
+                    load: function(){
+                        console.info("login successfull")
+                        checkValidationStatus();  
+                    },
+                    error: function(error){
+                        alert("error during login: " + error);
+                    }
+                });
+            }
+			
+            function logout(){
+
+                dojo.xhrPost({
+                    url:"cidsservermanager/logout",
+                    //url:"foo",
+                    handleAs:"text",
+                    load: function(){
+                        checkValidationStatus();
+                    },
+                    error: function(error){
+                        alert("error during logout" + error);
+                    }
+                });
+            }
+            
+            function checkValidationStatus(){
+                
+                dojo.xhrGet({
+                    url:"cidsservermanager/checkValidationStatus",
+                    //url:"foo",
+                    handleAs:"text",
+                    load: function(response){
+                        if(response == "true"){
+                            dojo.removeClass("stopServerButton","disabled");
+                            dojo.removeClass("restartServerButton","disabled");
+                            //                            dojo.removeClass("logoutButton","disabled");
+                            //                            dojo.removeClass("logFileButton","disabled");
+                            dojo.removeClass("runtimePropsButton","disabled");
+                            dojo.removeClass("saveRuntimePropsButton","disabled");
+                            
+                            dojo.addClass(dojo.byId("signInForm").user,"disabled");
+                            dojo.addClass(dojo.byId("signInForm").password,"disabled");
+                            
+                            dojo.byId("logOutDiv").style.display="inline";
+                            dojo.byId("logInDiv").style.display="none";
+                            
+                            enableLogLinks(true);
+                        }else{
+                            dojo.addClass("stopServerButton","disabled");
+                            dojo.addClass("restartServerButton","disabled");
+                            //                            dojo.addClass("logoutButton","disabled");
+                            //                            dojo.addClass("logFileButton","disabled");
+                            dojo.addClass("runtimePropsButton","disabled");
+                            dojo.addClass("saveRuntimePropsButton","disabled")
+                            
+                            dojo.byId("logOutDiv").style.display="none";
+                            dojo.byId("logInDiv").style.display="inline";
+                            enableLogLinks(false);
+                        }
+                    },
+                    error: function(error){
+                        dojo.addClass("stopServerButton","disabled");
+                        dojo.addClass("restartServerButton","disabled");
+                        //                        dojo.addClass("logoutButton","disabled");
+                        //                        dojo.addClass("logFileButton","disabled");
+                        dojo.addClass("runtimePropsButton","disabled");
+                        dojo.addClass("saveRuntimePropsButton","disabled")
+                        
+                        dojo.byId("logOutDiv").style.display="none";
+                        dojo.byId("logInDiv").style.display="inline";
+                        enableLogLinks(false);
+                    }
+                });
+            }
+            
+            function enableLogLinks(flag){
+                var serverLogFiles = dojo.byId("dropdown-friends-logfiles").getElementsByTagName("a");
+                var j=serverLogFiles.length-1;
+                var i=0;
+                
+                for(i=0;i<=j;i++){
+                    var logFileLink = serverLogFiles[i];
+                    if(flag){
+                        var link = logFileLink.getAttribute("link");
+                        logFileLink.setAttribute("href", link);
+                        logFileLink.setAttribute("target", "_blank");
+                        dojo.removeClass(logFileLink,"unreachable");
+                    }else{
+                        dojo.addClass(logFileLink,"unreachable");
+                        logFileLink.setAttribute("href", "#");
+                        logFileLink.setAttribute("target", "");
+                    }
+                }
+            }
+			
+                function restartServer(){
+			
+                    var s = dojo.byId("restartServerButton").attributes[0].nodeValue;
+				
+                    if(s.indexOf("disabled") >= 0)
+                    {
+                        console.info("is disabled");
+                    }else{
+				
+                        dojo.xhrPost({
+                            url:"cidsservermanager",
+                            postData:"server=restart",
+                            handleAs: "text",
+                            load: function(){
+                                console.info("post server restart")
+						
+                            },
+                            error: function(error){
+                                alert("error server restart" + error);
+						
+                            }
+                        });
+                    }
+                }
+			
+		
+            
+                //function that resizes the "main-div" to fit in the page. Avoids scrolling whole page	
+                function resize(){
+                    /*
+                                        Anpassen der Hoehe des Content-Divs, sodass footer am unteren rand klebt.
+                                        Dazu position des Divs, Hoehe des Footers und der Browserhoehe ermitteln
+                     */
+                    //Footer Height
+                    var footerNode = dojo.byId("footer");
+                    var footerHeight = dojo.style(footerNode, "height") ;
+										 
+                    //div position
+                    var scrollDiv = dojo.byId("contentNode");
+										 
+                    //console.log("Div Height before: "+ dojo.style("contentNodeParent", "height"));
+									
+                    //relativ zur document-root
+                    var scrollDivInfo = dojo.position(scrollDiv, true);
+                    var scrollDivY = scrollDivInfo.y;
+										 			 
+                    //browserfenster height
+                    var browserHeight = window.frames.innerHeight;
+										 
+                    //calculate height , konstanten faktor abziehen wg padding, margin kram -> verbessern...
+                    var scrollDivHeight = browserHeight - footerHeight - scrollDivY -100;
+                    //console.log("new height: "+scrollDivHeight);
+                    dojo.style("contentNode","height",scrollDivHeight+"px");
+                
+                    //                var autoScrollSignMargin = scrollDivHeight;
+                    //                console.info("margin top für sign: "+autoScrollSignMargin);
+                    //                dojo.style("autoScrollSign",{"margin-top":"200px"});
+                    //                dojo.byId("autoScrollSign").style.marginTop=autoScrollSignMargin +"px";
+
+                    console.log("Div Height after: "+ dojo.style("contentNodeParent","height"));
+                }
+			
+                function getDBConnection(){
+
+                    dojo.xhrGet({
+                        // The URL of the request
+                        //url: "http://localhost/bootstrap/examples/runtime.properties",
+                        url: "/cidsservermanager/dbConnection",
+                        // The success callback with result from server
+                        load: function(response){
+                            console.info(response);
+                            console.info("---");
+                            dojo.byId("DBConnection").innerHTML=response;
+                        },
+                        error: function(error){
+                            console.info("Error retriving ServerTitle");
+                            dojo.byId("DBConnection").innerHTML="";
+                        },
+                        // generate an extra GET variable to prevent browsers from caching
+                        preventCache: true
+                    });
+                }
+			
+                function getServerTitle(){
+                
+                    dojo.xhrGet({
+                        // The URL of the request
+                        //url: "http://localhost/bootstrap/examples/runtime.properties",
+                        url: "cidsservermanager/serverTitle",
+                        // The success callback with result from server
+                        load: function(response){
+                            console.info(response);
+                            console.info("---");
+                            dojo.byId("serverTitle").innerHTML=response;
+                        },
+                        // The error handler
+                        error: function(error){
+                            console.info("Error retriving ServerTitle");
+                            dojo.byId("serverTitle").innerHTML="cids Domainserver";
+                        },
+                        // generate an extra GET variable to prevent browsers from caching
+                        preventCache: true
+                    });
+                }
+			
+                function generateDropDownServerFriendsMenu(){
+
+                    dojo.xhrGet({
+                        // The URL of the request
+                        //url: "http://localhost/bootstrap/examples/runtime.properties",
+                        url: "/cidsservermanager/serverFriends",
+                        // The success callback with result from server
+                        load: function(response){
+                            console.info(response);
+                            var keyValuePairs = response.split(";");
+                            var friendsList="";
+                            var i=0;
+                            var j = keyValuePairs.length-1;
+                            for(i=0;i<=j;i++){
+                                var entry = keyValuePairs[i].split(",");
+                                var adress = entry[0];
+                                friendsList += '<li><a linkcache="'+ entry[0]+'" href="' + entry[0] +'">'+ entry[1] +'</a></li>';
+                                friendsList+='<li class="divider"></li>';
+                            }
+                            console.info(friendsList);			
+                            dojo.byId("dropdown-friends").innerHTML=friendsList;
+                            //TODO: same domain policy for JavaScript problem
+                            //checkServerFriendsAvailability();
+                        },
+                        error: function(error){
+                            console.info("Error retriving FriendsList "+error);
+                        },
+                        // generate an extra GET variable to prevent browsers from caching
+                        preventCache: true
+                    });
+                }
+            
+                function generateDropDownLogfilesMenu(){
+                    dojo.xhrGet({
+                        // The URL of the request
+                        //url: "http://localhost/bootstrap/examples/runtime.properties",
+                        url: "/cidsservermanager/serverLogfiles",
+                        // The success callback with result from server
+                        load: function(response){
+                            console.info(response);
+                            var entry = response.split(";");
+                            var logFileList="";
+                            var i=0;
+                            var j = entry.length-1;
+                            for(i=0;i<=j;i++){
+                                logFileList += '<li><a class="unreachable" link="/cidsservermanager/serverLogFile?name='+entry[i]+'"href="#" >'+ entry[i]+' - Logfile' +'</a></li>';
+                                logFileList+='<li class="divider"></li>';
+                            }
+                        
+                            console.info(logFileList);			
+                            dojo.byId("dropdown-friends-logfiles").innerHTML=logFileList;
+                            //TODO: same domain policy for JavaScript problem
+                            //checkServerFriendsAvailability();
+                        },
+                        error: function(error){
+                            console.info("Error retriving logfile List "+error);
+                        },
+                        // generate an extra GET variable to prevent browsers from caching
+                        preventCache: true
+                    });
+                }
+            
+                function checkServerFriendsAvailability(){
+                    var t = setTimeout("checkServerFriendsAvailability()",10000);
+                    var serverFriendsList = dojo.byId("dropdown-friends").getElementsByTagName("a");
+                    var j=serverFriendsList.length-1;
+                    var i=0;
+                
+                    for(i=0;i<=j;i++){
+                        var serverFriendsElement = serverFriendsList[i];
+                        var adress = serverFriendsElement.getAttribute("linkcache");
+                        //set all serverfriends unreachble
+                        dojo.addClass(serverFriendsElement,"unreachable");
+                        serverFriendsElement.setAttribute("href", "#");
+                    
+                        var queryUrl = adress+"/isReachable";
+                        console.info("is reachable query url: "+queryUrl);
+                        //check if they are still reachable, url is sent as parameter since xhrGet is asynchronous
+                        //this helps in load() to identitfy which link we have checked...
+                        dojo.xhrGet({
+                            url:queryUrl,
+                            content: {
+                                url:queryUrl
+                            },
+                            load:function(result){
+                                var friendslist = dojo.byId("dropdown-friends").getElementsByTagName("a");
+                                var k = serverFriendsList.length-1;
+                                var l =0;
+                                for(l=0;l<=k;l++){
+                                    var elem = friendslist[l];
+                                    var addr = elem.getAttribute("linkcache")+"/isReachable";
+                                    if(result == addr){
+                                        dojo.removeClass(elem,"unreachable");
+                                        elem.setAttribute("href", addr);
+                                    }
+                                }
+                            },
+                            error:function(){
+                                console.info("error during is reachable");
+                            }
+                        });
+                    }
+                }
+            
+            
+                function getServerLogFile(logFileName){
+				
+                    //                if(s.indexOf("disabled") >= 0)
+                    //                {
+                    //                    console.info("logFile button is disabled");
+                    //                }else{
+                    console.info("test:"+logFileName);
+                    dojo.xhrGet({
+                        url:"/cidsservermanager/serverLogFile",
+                        content: {
+                            name:logFileName
+                        },
+                        load:function(){
+                            //window.open(result);
+                        },
+                        error:function(){
+                            console.info("error during retrievin log file");
+                        }
+                    });
+                    //                }
+                }
+            
+                function getServerLogFile(){
+            
+                    window.open("/cidsservermanager/serverLogFile");
+				
+                    ////                if(s.indexOf("disabled") >= 0)
+                    ////                {
+                    ////                    console.info("logFile button is disabled");
+                    ////                }else{
+                    //                    console.info("test:");
+                    //                    dojo.xhrGet({
+                    //                        url:"/cidsservermanager/serverLogFile",
+                    ////                        content: {
+                    ////                            name:logFileName
+                    ////                        },
+                    //                        load:function(result){
+                    //                            window.open(result);
+                    //                        },
+                    //                        error:function(){
+                    //                            console.info("error during retrievin log file");
+                    //                        }
+                    //                    });
+                    ////                }
+                }
+            
+            
+                function showModal(){
+                    var s = dojo.byId("runtimePropsButton").attributes[1].nodeValue;
+				
+                    if(s.indexOf("disabled") >= 0)
+                    {
+                        console.info("runtimePropsButton button is disabled do not show the modal");
+                    }else{
+                        console.info("show Modal");
+                        $('#editConfigFileModal').modal('toggle');
+                    }
+                }
+            
+                // When the DOM is ready....
+                dojo.ready(function(){
+                    // Populate content initially
+                    //refreshContent();
+                    // Connect button
+                    dojo.connect(dojo.byId("xxx"),"onclick",refreshContent);
+                    dojo.connect(dojo.byId("runtimePropsButton"),"onclick",loadRuntimeProperties);
+                    dojo.connect(dojo.byId("stopServerButton"),"onclick",stopServer);
+                    dojo.connect(dojo.byId("restartServerButton"),"onclick",restartServer);
+                    //                dojo.connect(dojo.byId("logFileButton"),"onclick",getServerLogFile);
+                    dojo.connect(dojo.byId("pwdField"),"onkeypress",loginOnEnter);
+                    dojo.connect(window, "onresize", resize)
+                    //                dojo.connect(dojo.byId("logoutButton"),"onclick",logout);
+                    generateDropDownServerFriendsMenu();
+                    generateDropDownLogfilesMenu();
+                    timer();
+                    resize();
+                    checkValidationStatus();
+                    console.debug("ready");
+                });
+        </script>
+
+
+
+    </head>
+
+    <body>
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="brand" href="#" >cismet console</a>
+                    <ul class="nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Server Friends<b class="caret"></b></a>
+                            <ul class="dropdown-menu" id="dropdown-friends">
+
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Logfiles<b class="caret"></b></a>
+                            <ul class="dropdown-menu" id="dropdown-friends-logfiles">
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="navbar-search pull-right" style="">
+                        <div id="logInDiv">
+                            <form id="signInForm" action="cidsservermanager"  style="margin-bottom:0px;">
+                                <input  name="user" class="input-small" type="text" placeholder="Username" style="margin-top:5px;">
+                                <input id="pwdField" name="password" class="input-small" type="password" placeholder="Password" style="margin-top:5px;">
+                                <a class="btn" href="javascript: login()" style="margin-top:4px;">Sign in</a>
+                            </form>
+                        </div>
+                        <div id="logOutDiv" style="display:none;">
+                            <text id="loginText" style="color:#ffffff;"> Logged In. &nbsp;&nbsp;&nbsp;</text>
+                            <a class="btn" href="javascript: logout()" style="margin-top:4px;">Log out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="container">
+
+            <div class="content span11">
+                <div class="page-header">
+                    <h1 id="serverTitle">
+                        <script type="text/javascript">
+                                getServerTitle();
+                        </script> 
+                    </h1>
+                    <h1>
+                        <small id="DBConnection">
+                            <script type="text/javascript">
+                                    getDBConnection();
+                            </script> 
+                        </small>
+                    </h1>
+                    <hr>
+                    <div align="center">
+                        <button id="stopServerButton" class="btn btn-danger">Shutdown server</button>&nbsp;
+
+                        <button id="restartServerButton" class="btn btn-success" >Start server</button>&nbsp;
+                        <button id="runtimePropsButton" class="btn btn-info" onclick="showModal()">
+                            Edit config file
+                        </button>&nbsp;
+                        <!-- runtime props editor the modal-->
+                        <div id="editConfigFileModal" class="modal hide fade">
+                            <div class="modal-header">
+                                <a class="close" data-dismiss="modal" >&times;</a>
+                                <h3>Runtime.properties</h3>
+                            </div>
+                            <div class="modal-body">
+                                <form id="runtimePropertiesForm">
+                                    <div style="height:300px; margin:0px auto; ">
+                                        <textarea class="input-xlarge" name="textarea" id="runtimePropsTextArea" style="width:100%;height:100%; margin-left:-4px;" > 
+
+                                        </textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button  id="saveRuntimePropsButton" onclick="saveRuntimeProperties ();" class="btn btn-primary ">Save</button>
+                                <button  onclick="closeModal ();" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                        <!-- end of modal-->
+
+                        <!--                        <button id="logoutButton" class="btn btn-primary">Log out</button>&nbsp;-->
+                        <!--                        <button class=" btn btn-info" id="logFileButton" >Server Logfile</button>&nbsp;-->
+                    </div>
+                </div>
+                <div class="span10" style="width:820px; " id="contentNodeParent">
+                    <pre class="prettyprint" id="contentNode" style="overflow-y:scroll;">
+
+                    </pre>
+                    <!--                                        <div style="z-index:222222;  position: absolute; top: 545px; left: 1245px;">
+                                                            <img id="autoScrollSign" src="/img/autoscroll.png" rel="popover" title="Autoscroll" data-content="active" style="height:60%; width:60%;"/> 
+                                                            </div>-->
+                </div>
+
+                <!--
+                                    <script>  
+                                        $(function ()  
+                                        { $("#autoScrollSign").popover({ animation: true, placement: 'right', trigger: 'hover' });  
+                                        });  
+                                    </script>  -->
+            </div>
+            <footer class="span10" id="footer" style="margin-top:10px; border-width:0px; ">
+                <p>&copy; cismet GmbH 2012</p>
+            </footer>
+
+        </div> <!-- /container -->
+
+    </body>
+</html>

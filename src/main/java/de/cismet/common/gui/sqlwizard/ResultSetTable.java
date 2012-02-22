@@ -179,7 +179,7 @@ public class ResultSetTable extends JTable // implements HistorySupport
      * this.history.add(this.tableSorter.getModel());         this.selectedIndex = this.history.size()-1;     } } else {
      * if(this.maxHistorySize > 0)     {         if(index <= this.history.size())         {             int i =
      * this.history.size();             for(; i <= index; i++)             {                 this.history.add(null);  }
-     *      }                  this.history.set(index, this.tableSorter.getModel());
+     *    }                  this.history.set(index, this.tableSorter.getModel());
      * this.selectedIndex = index;     } }}*/
 
     /**
