@@ -74,7 +74,9 @@ public class RESTfulServerManager {
                 }
             }
         } else {
-            logger.info("could not find ");
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find easyDevelopmentProperty");
+            }
         }
     }
 
@@ -446,6 +448,19 @@ public class RESTfulServerManager {
                     Exceptions.printStackTrace(ex);
                 }
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  request  DOCUMENT ME!
+     */
+    @POST
+    @Path("/clearConsoleOutput")
+    public void clearConsoleOutput(@Context final HttpServletRequest request) {
+        if (isValidatedSession(request) && (serverCon != null)) {
+            serverCon.clearLogMessages();
         }
     }
 
