@@ -392,9 +392,9 @@ public class ConnectionTreeNodeModel extends DefaultConnectionModel {
      * JTree jt = new JTree(dtm);  jt.addTreeExpansionListener(new TreeExpansionListener()  {      public void
      * treeCollapsed(TreeExpansionEvent event)      {}            public void treeExpanded(TreeExpansionEvent event) {
      * Object object = event.getPath().getLastPathComponent();          if(object instanceof ConnectableTreeNode)     {
-     *          ((ConnectableTreeNode)object).explore(); dtm.nodeStructureChanged((ConnectableTreeNode)object);    }   }
-     *        });    final JButton jb1 = new JButton("Remove Link");  jb1.addActionListener(new ActionListener()  {
-     * public void actionPerformed(ActionEvent e)      {          //ctm.removeLink(l_2);  //ctm.removeLink(0);,
+     *        ((ConnectableTreeNode)object).explore(); dtm.nodeStructureChanged((ConnectableTreeNode)object);    }   }
+     *     });    final JButton jb1 = new JButton("Remove Link");  jb1.addActionListener(new ActionListener()  { public
+     * void actionPerformed(ActionEvent e)      {          //ctm.removeLink(l_2);  //ctm.removeLink(0);,
      * ctm.addLink(l_4);          dtm.nodeChanged(ctm.getRootNode());          dtm.reload(); }  });    final JButton jb2
      * = new JButton("Remo ve Node");  jb2.addActionListener(new ActionListener()  { public void
      * actionPerformed(ActionEvent e)      {          //ctm.removeConnectable(1); ctm.removeConnectable(dc_2);

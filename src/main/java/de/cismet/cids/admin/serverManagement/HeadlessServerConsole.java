@@ -41,6 +41,8 @@ import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import de.cismet.tools.CismetThreadPool;
+
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 /**
@@ -1116,14 +1118,20 @@ public class HeadlessServerConsole {
                 }
             });
 
-        try {
-            if (startMiniatureServer) {
-                con.startMiniatureServer();
-            }
-        } catch (Throwable e) {
-            System.out.println("Miniature Web Server konnte nicht gestartet werden!");
-            e.printStackTrace();
-        }
+        CismetThreadPool.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        if (startMiniatureServer) {
+                            con.startMiniatureServer();
+                        }
+                    } catch (Throwable e) {
+                        System.out.println("Miniature Web Server konnte nicht gestartet werden!");
+                        e.printStackTrace();
+                    }
+                }
+            });
 
         con.startServer();
     }

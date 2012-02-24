@@ -30,11 +30,13 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
 
-/* MiniatureServer Code an neue MiniServerVersion angepasst.
- * Variable miniatureServerInstance wurde entfernt.
+import de.cismet.tools.CismetThreadPool;
+
+/*
+ * MiniatureServer Code an neue MiniServerVersion angepasst. Variable
+ * miniatureServerInstance wurde entfernt.
  *
  */
-
 /**
  * The class ServerConsole starts a cids server specified by a class parameter and creates a console to manage the
  * server. The console shows logging and runtime information, if needed a help file and provides functions to shutdown
@@ -58,9 +60,7 @@ public class ServerConsoleGui extends javax.swing.JFrame {
                 "/de/cismet/cids/admin/serverConsole/buttons/yellowled.png"));
     private ImageIcon green = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/cids/admin/serverConsole/buttons/greenled.png"));
-
     /** Displays the server's status with a JOptionPane. */
-
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -557,10 +557,8 @@ public class ServerConsoleGui extends javax.swing.JFrame {
      */
     private void cmdSaveLogsActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_cmdSaveLogsActionPerformed
     {                                                                             //GEN-HEADEREND:event_cmdSaveLogsActionPerformed
-
-        // TODO add your handling code here:
-
-    } //GEN-LAST:event_cmdSaveLogsActionPerformed
+                                                                                  // TODO add your handling code here:
+    }                                                                             //GEN-LAST:event_cmdSaveLogsActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -825,15 +823,21 @@ public class ServerConsoleGui extends javax.swing.JFrame {
         conGui.setSize(550, 550);
         conGui.setLocationRelativeTo(null);
         conGui.show();
+        CismetThreadPool.execute(new Runnable() {
 
-        try {
-            if (HeadlessServerConsole.startMiniatureServer) {
-                conGui.startMiniatureServer();
-            }
-        } catch (Throwable e) {
-            System.out.println("Miniature Web Server konnte nicht gestartet werden!");
-            e.printStackTrace();
-        }
+                @Override
+                public void run() {
+                    try {
+                        if (HeadlessServerConsole.startMiniatureServer) {
+                            conGui.startMiniatureServer();
+                        }
+                    } catch (Throwable e) {
+                        System.out.println("Miniature Web Server konnte nicht gestartet werden!");
+                        e.printStackTrace();
+                    }
+                }
+            });
+
         conGui.startServer();
 
         final Runnable refreshingGui = new Runnable() {
@@ -1273,7 +1277,6 @@ public class ServerConsoleGui extends javax.swing.JFrame {
     public javax.swing.JButton getCmdTray() {
         return cmdTray;
     }
-
 //    protected SysTrayMenuIcon getStIcon() {
 //        return stIcon;
 //    }
@@ -1282,5 +1285,4 @@ public class ServerConsoleGui extends javax.swing.JFrame {
 //        return stMenu;
 //    }
 //
-
 }
