@@ -261,13 +261,54 @@ public class HeadlessServerConsole {
         try {
             getRuntimeProperties().load(new FileInputStream("runtime.properties"));
             System.out.println("runtime.properties gefunden");
-            parameter.put("serverType", getRuntimeProperties().getProperty("serverTitle"));
-            parameter.put("serverClassName", getRuntimeProperties().getProperty("serverClass"));
-            parameter.put("log4jConfig", getRuntimeProperties().getProperty("log4jConfig"));
-            parameter.put("miniatureServerPort", getRuntimeProperties().getProperty("webserverPort"));
-            parameter.put("serverManagementRoot", getRuntimeProperties().getProperty("managementRoot"));
-            parameter.put("miniatureServerConfig", getRuntimeProperties().getProperty("webserverInterfaceConfig"));
-            serverArgs = getRuntimeProperties().getProperty("runtimeArgs").split(" ");
+            if (getRuntimeProperties().containsKey("serverConsole.serverTitle")) {
+                parameter.put("serverType", getRuntimeProperties().getProperty("serverConsole.serverTitle"));
+            } else {
+                parameter.put("serverType", getRuntimeProperties().getProperty("serverTitle"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.serverClass")) {
+                parameter.put("serverClassName", getRuntimeProperties().getProperty("serverConsole.serverClass"));
+            } else {
+                parameter.put("serverClassName", getRuntimeProperties().getProperty("serverClass"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.log4jConfig")) {
+                parameter.put("log4jConfig", getRuntimeProperties().getProperty("serverConsole.log4jConfig"));
+            } else {
+                parameter.put("log4jConfig", getRuntimeProperties().getProperty("log4jConfig"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.webinterface.webserverPort")) {
+                parameter.put(
+                    "miniatureServerPort",
+                    getRuntimeProperties().getProperty("serverConsole.webinterface.webserverPort"));
+            } else {
+                parameter.put("miniatureServerPort", getRuntimeProperties().getProperty("webserverPort"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.managementRoot")) {
+                parameter.put(
+                    "serverManagementRoot",
+                    getRuntimeProperties().getProperty("serverConsole.managementRoot"));
+            } else {
+                parameter.put("serverManagementRoot", getRuntimeProperties().getProperty("managementRoot"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.webinterface.webserverInterfaceConfig")) {
+                parameter.put(
+                    "miniatureServerConfig",
+                    getRuntimeProperties().getProperty("serverConsole.webinterface.webserverInterfaceConfig"));
+            } else {
+                parameter.put("miniatureServerConfig", getRuntimeProperties().getProperty("webserverInterfaceConfig"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.cidsServerRuntimeArgs")) {
+                serverArgs = getRuntimeProperties().getProperty("serverConsole.cidsServerRuntimeArgs").split(" ");
+            } else {
+                serverArgs = getRuntimeProperties().getProperty("runtimeArgs").split(" ");
+            }
+
             serverLogFileName = getRuntimeProperties().getProperty("log4j.appender.ErrorHtml.file");
             parameter.put("cidsServerArgs", serverArgs);
         } catch (IOException skip) {
@@ -593,7 +634,11 @@ public class HeadlessServerConsole {
              *
              */
             try {
-                logOutputDirectory = new File(serverProperties.getString("LogOutputDirectory"));
+                if (serverProperties.containsKey("serverConsole.logOutputDirectory")) {
+                    logOutputDirectory = new File(serverProperties.getString("serverConsole.logOutputDirectory"));
+                } else {
+                    logOutputDirectory = new File(serverProperties.getString("LogOutputDirectory"));
+                }
             } catch (Throwable e) {
                 logger.error(
                     "LogOutputDirectory konnte nicht aus der Konfigurationsdatei des Miniature Servers gelesen werden.",

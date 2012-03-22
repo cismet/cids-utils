@@ -142,9 +142,10 @@
                 dojo.xhrGet({
                     // The URL of the request
                     url: "/cidsservermanager/serverConsole",
-                    //url: "/log/logOutput82.htm",
-                    // The success callback with result from server
                     load: function(consoleContent) {
+                        //if console output contains html elements, they must be escaped in order to keep site structure 
+                        consoleContent = consoleContent.replace(/</g,"&lt;");
+                        consoleContent = consoleContent.replace(/>/g,"&gt;");
                         dojo.byId("contentNode").innerHTML = consoleContent;
                     },
                     // The error handler

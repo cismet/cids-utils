@@ -61,23 +61,6 @@ public class RESTfulServerManager {
      */
     public RESTfulServerManager() {
         serverCon = HeadlessServerConsole.getInstance();
-
-        if (serverCon.getRuntimeProperties().containsKey("serverConsole.easyDevelopment")) {
-            final String easyDevelopmentProperty = serverCon.getRuntimeProperties()
-                        .getProperty("serverConsole.easyDevelopment");
-
-            if (easyDevelopmentProperty != null) {
-                if (easyDevelopmentProperty.equals("true") || easyDevelopmentProperty.equals(1)) {
-                    developmentFlag = true;
-                } else {
-                    developmentFlag = false;
-                }
-            }
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("could not find easyDevelopmentProperty");
-            }
-        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -198,8 +181,26 @@ public class RESTfulServerManager {
     @GET
     @Produces("text/html")
     public String showMainApp() {
-        logger.info("get cidsservermanager - return html site");
+        // logger.info("get cidsservermanager - return html site");
         BufferedReader bfr;
+        String easyDevelopmentProperty = null;
+        if (serverCon.getRuntimeProperties().containsKey("serverConsole.easyDevelopment")) {
+            easyDevelopmentProperty = serverCon.getRuntimeProperties().getProperty("serverConsole.easyDevelopment");
+        } else if (serverCon.getRuntimeProperties().containsKey("serverConsole.webinterface.easyDevelopment")) {
+            easyDevelopmentProperty = serverCon.getRuntimeProperties().getProperty("serverConsole.easyDevelopment");
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find easyDevelopmentProperty");
+            }
+        }
+        if (easyDevelopmentProperty != null) {
+            if (easyDevelopmentProperty.equals("true") || easyDevelopmentProperty.equals(1)) {
+                developmentFlag = true;
+            } else {
+                developmentFlag = false;
+            }
+        }
+
         try {
             if (developmentFlag) {
                 baseFile = new File("./webinterface/serverConsole.html");
@@ -337,12 +338,13 @@ public class RESTfulServerManager {
     public String getServerTitle() throws IOException {
         final Properties runtimeProps = serverCon.getRuntimeProperties();
 
-        if (runtimeProps.containsKey("serverTitle")) {
-            final String serverTitle = runtimeProps.getProperty("serverTitle");
-
-            return serverTitle;
+        String serverTitle = "";
+        if (runtimeProps.containsKey("serverConsole.serverTitle")) {
+            serverTitle = runtimeProps.getProperty("serverConsole.serverTitle");
+        } else if (runtimeProps.containsKey("serverTitle")) {
+            serverTitle = runtimeProps.getProperty("serverTitle");
         }
-        return "error";
+        return serverTitle;
     }
 
     /**
@@ -378,11 +380,15 @@ public class RESTfulServerManager {
     @Produces("text/plain")
     public String getServerConsoleFriends() throws IOException {
         final Properties runtimeProps = serverCon.getRuntimeProperties();
-        if (runtimeProps.containsKey("serverConsole.friends")) {
-            final String serverConsoleFriends = runtimeProps.getProperty("serverConsole.friends");
-            return serverConsoleFriends;
+        String serverConsoleFriends = "";
+
+        if (runtimeProps.containsKey("serverConsole.webinterface.friends")) {
+            serverConsoleFriends = runtimeProps.getProperty("serverConsole.webinterface.friends");
+        } else if (runtimeProps.containsKey("serverConsole.friends")) {
+            serverConsoleFriends = runtimeProps.getProperty("serverConsole.friends");
         }
-        return "";
+
+        return serverConsoleFriends;
     }
 
     /**
@@ -397,11 +403,15 @@ public class RESTfulServerManager {
     @Produces("text/plain")
     public String getServerLogfiles() throws IOException {
         final Properties runtimeProps = serverCon.getRuntimeProperties();
-        if (runtimeProps.containsKey("serverConsole.Logfiles")) {
-            final String serverConsoleFriends = runtimeProps.getProperty("serverConsole.Logfiles");
-            return serverConsoleFriends;
+        String serverLogFiles = "";
+
+        if (runtimeProps.containsKey("serverConsole.webinterface.logfiles")) {
+            serverLogFiles = runtimeProps.getProperty("serverConsole.webinterface.logfiles");
+        } else if (runtimeProps.containsKey("serverConsole.Logfiles")) {
+            serverLogFiles = runtimeProps.getProperty("serverConsole.Logfiles");
         }
-        return "";
+
+        return serverLogFiles;
     }
 
     /**
@@ -431,7 +441,7 @@ public class RESTfulServerManager {
             FileWriter fw = null;
             BufferedWriter f = null;
             try {
-                logger.info(file.getCanonicalPath());
+                // logger.info(file.getCanonicalPath());
                 if (file.exists() || file.canRead()) {
                     fw = new FileWriter(file.getAbsoluteFile());
                     f = new BufferedWriter(fw);
