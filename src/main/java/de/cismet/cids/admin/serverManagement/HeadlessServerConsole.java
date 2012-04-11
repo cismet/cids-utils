@@ -82,7 +82,7 @@ public class HeadlessServerConsole {
     protected static Boolean startsWithGui = false;
     protected static HeadlessServerConsole instance;
     protected static String serverManagementRoot = null;
-    protected static File cidsServerConfigFile = null;
+    protected static File cidsServerConfigFile;
     protected static boolean startMiniatureServer = true;
     protected static StringBuffer logStringBuffer = new StringBuffer();
     protected static MyPrintStream mySysOut;
@@ -208,15 +208,6 @@ public class HeadlessServerConsole {
     }
 
     /**
-     * Gets the configuration file of the cids server.
-     *
-     * @return  the configuration file of the Mini Webserver
-     */
-    public static File getCidsServerConfigFile() {
-        return cidsServerConfigFile;
-    }
-
-    /**
      * DOCUMENT ME!
      *
      * @param  args  DOCUMENT ME!
@@ -268,7 +259,8 @@ public class HeadlessServerConsole {
 
         setRuntimeProperties(new Properties());
         try {
-            getRuntimeProperties().load(new FileInputStream("runtime.properties"));
+            cidsServerConfigFile = new File("runtime.properties"); // NOI18N
+            getRuntimeProperties().load(new FileInputStream(cidsServerConfigFile));
             System.out.println("runtime.properties gefunden");
             if (getRuntimeProperties().containsKey("serverConsole.serverTitle")) {
                 parameter.put("serverType", getRuntimeProperties().getProperty("serverConsole.serverTitle"));
@@ -641,31 +633,6 @@ public class HeadlessServerConsole {
                         .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                         .put(configLoggerKeyStroke, "CONFIGLOGGING");
                 theGuiFrame.getRootPane().getActionMap().put("CONFIGLOGGING", configAction);
-            }
-        }
-
-        /*
-         * Read out and, if necessary, complete the absolute path of the cids server's configuration file and deliver to
-         * the variable cidsServerConfigFile. This variable is needed to be able to edit the configuration file with the
-         * FileEditor of the ServerConsole and within the management web interface.
-         *
-         */
-        if (serverArgs.length >= 1) {
-            cidsServerConfigFile = new File(serverArgs[0]);
-
-            if (!cidsServerConfigFile.isAbsolute()) {
-                cidsServerConfigFile = new File(workpath, cidsServerConfigFile.getPath());
-            }
-            if (cidsServerConfigFile.isDirectory() || !cidsServerConfigFile.exists()
-                        || !cidsServerConfigFile.canRead()) {
-                System.err.println(java.util.ResourceBundle.getBundle(
-                        "de/cismet/cids/admin/serverManagement/resources").getString(
-                        "Die_Konfigurationsdatei_f?r_den_cids_Server") + cidsServerConfigFile
-                            + "\" kann nicht gelesen werden!\n"
-                            + java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources")
-                            .getString("config_file_muss_als_erster_Parameter_hinter_-a_stehen")
-                            + "\nDie ServerConsole muss mit richtiger Kommandozeilenparameter-Reihenfolge neu gestartet werden!");
-                cidsServerConfigFile = null;
             }
         }
 
