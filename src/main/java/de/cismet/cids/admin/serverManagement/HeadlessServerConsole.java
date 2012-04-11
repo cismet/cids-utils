@@ -11,7 +11,6 @@ import Sirius.server.ServerExit;
 import Sirius.server.ServerExitError;
 import Sirius.server.ServerStatus;
 import Sirius.server.newuser.User;
-import Sirius.server.newuser.UserGroup;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -22,9 +21,15 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -37,7 +42,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.PropertyResourceBundle;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
@@ -79,7 +90,6 @@ public class HeadlessServerConsole {
     static SimpleAttributeSet STANDARD = new SimpleAttributeSet();
     static SimpleAttributeSet INFO = new SimpleAttributeSet();
     static SimpleAttributeSet ERROR = new SimpleAttributeSet();
-//    protected String serverLogFileName;
     static Logger logger;
 
     //~ Instance fields --------------------------------------------------------
@@ -93,7 +103,6 @@ public class HeadlessServerConsole {
     protected Class serverClass = null;
     protected JTextPane theGuiComponent = null;
     protected ServerConsoleGui theGuiFrame = null;
-//     protected HashMap miniatureServerArgs = null;
     protected String serverType = null;
     protected String log4jConfig = "default";
     protected String miniatureServerPort = null;
@@ -381,8 +390,8 @@ public class HeadlessServerConsole {
                                 "ungueltige_kommandozeilenparameterangabe"),
                     "cids ServerConsole",
                     JOptionPane.ERROR_MESSAGE);
+                theGuiFrame.showHelp(START_HELP_FILE);
             }
-            theGuiFrame.showHelp(START_HELP_FILE);
             System.exit(0);
         }
 
@@ -392,14 +401,12 @@ public class HeadlessServerConsole {
          */
         if (parameter.get("serverType") != null) {
             serverType = (String)parameter.get("serverType");
-            // System.out.println("serverType: " + serverType);
         } else {
             System.err.println("Parameter serverType wurde nicht angegeben!");
         }
 
         if (parameter.get("serverClassName") != null) {
             serverClassName = (String)parameter.get("serverClassName");
-            // System.out.println("serverClassName: " + serverClassName);
         } else {
             if (startsWithGui) {
                 JOptionPane.showMessageDialog(
@@ -421,7 +428,6 @@ public class HeadlessServerConsole {
 
         if (parameter.get("log4jConfig") != null) {
             log4jConfig = (String)parameter.get("log4jConfig");
-            // System.out.println("log4jConfig: " + log4jConfig);
         } else {
             System.out.println("Parameter log4jFile wurde nicht angegeben.");
         }
@@ -438,7 +444,6 @@ public class HeadlessServerConsole {
             } else {
                 miniatureServerPort = DEFAULT_MINIATURE_SERVER_PORT;
             }
-            // System.out.println("miniatureServerPort: " + miniatureServerPort);
         } else {
             System.err.println(java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources")
                         .getString("miniatureServerPort_nicht_angegeben"));
@@ -454,7 +459,6 @@ public class HeadlessServerConsole {
                             + "\" kann nicht gelesen werden!\nDas Arbeitsverzeichnis des cids Servermanagements ist "
                             + workpath + ".");
             }
-            // System.out.println("serverManagementRoot: " + serverManagementRoot);
         } else {
             workpath = new File(System.getProperty("user.dir"));
             System.out.println(
@@ -465,7 +469,6 @@ public class HeadlessServerConsole {
 
         if (parameter.get("miniatureServerConfig") != null) {
             miniatureServerConfig = (String)parameter.get("miniatureServerConfig");
-            // System.out.println("miniatureServerConfig: " + miniatureServerConfig);
         } else {
             System.out.println("Parameter miniatureServerConfig wurde nicht angegeben.");
         }
@@ -475,11 +478,6 @@ public class HeadlessServerConsole {
             System.out.println(java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources")
                         .getString("Fuer_den_cids_Server_wurden_keine_Parameter_angegeben"));
         }
-
-        /*
-         * System.out.println("serverArgs.length: " + serverArgs.length); for (int i=0; i < serverArgs.length; ) {
-         * System.out.println("serverArgs[" + i + "]: " + serverArgs[i]); ++i;}
-         */
 
         /*
          * Initialise log4j with the given or with a standard properties file.
@@ -506,13 +504,6 @@ public class HeadlessServerConsole {
         HeadlessServerConsole.logger = HeadlessServerConsole.logger.getLogger(HeadlessServerConsole.class);
 
         if (startsWithGui) {
-            // enable System Tray functions only under operating system Windows:
-// if ((System.getProperty("os.name").toLowerCase().indexOf("windows") != -1)
-// && SysTrayMenu.isAvailable() ) {
-// theGuiFrame.getCmdTray().setEnabled(true);
-// theGuiFrame.initSysTray(serverClassName, serverType);
-// }
-
             try {
                 theGuiFrame.getLblIcon()
                         .setIcon(new javax.swing.ImageIcon(
@@ -525,7 +516,7 @@ public class HeadlessServerConsole {
                             "/de/cismet/cids/admin/serverConsole/serverSymbols/16/"
                                     + serverClassName
                                     + ".png")).getImage());
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 theGuiFrame.getLblIcon()
                         .setIcon(new javax.swing.ImageIcon(
                                 getClass().getResource(
@@ -599,35 +590,6 @@ public class HeadlessServerConsole {
                 }
             }
 
-            try {
-                // TODO entfernen
-// miniatureServerArgs = new String[] {
-// serverProperties.getString("AliasesDefinitionFile_option"),
-// serverProperties.getString("AliasesDefinitionFile_value"),
-// serverProperties.getString("ServletPropertiesFile_option"),
-// serverProperties.getString("ServletPropertiesFile_value"),
-// "-p", miniatureServerPort
-// //serverProperties.getString("LogOption"),
-// //serverProperties.getString("LogOption_value"),
-// //"-sr", workpath.toString(),
-// //serverProperties.getString("SessionTimeOutInMinutesOption"),
-// //serverProperties.getString("SessionTimeOutInMinutesValue")
-// };
-////            // miniatureServerArgs = new HashMap();
-                // TODO entfernen
-//                System.out.println("JF: " + workpath.toString());
-//                miniatureServerArgs.put(Serve.ARG_ALIASES,  serverProperties.getString("AliasesDefinitionFile_value") );
-//                miniatureServerArgs.put(Serve.ARG_SERVLETS, serverProperties.getString("ServletPropertiesFile_value") );
-//                miniatureServerArgs.put(Serve.ARG_PORT, new Integer(miniatureServerPort) );
-            } catch (Throwable e) {
-                logger.fatal(java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources")
-                            .getString("Fehler_beim_Einlesen_der_Konfigurationsparameter_fuer_den_MiniServer"),
-                    e);
-                System.err.println(java.util.ResourceBundle.getBundle(
-                        "de/cismet/cids/admin/serverManagement/resources").getString(
-                        "Fehler_beim_Einlesen_der_Konfigurationsdatei_fuer_den_MiniServer"));
-            }
-
             /*
              * Read out and, if necessary, complete the absolute path for the temporary logging files of the servlet
              * from the Miniature Server's configuration file.
@@ -649,9 +611,7 @@ public class HeadlessServerConsole {
             }
             if (!logOutputDirectory.isAbsolute()) {
                 logOutputDirectory = new File(workpath, logOutputDirectory.getPath());
-                // logOutputDirectory.mkdirs();
             } else {
-                // logOutputDirectory.mkdirs();
             }
             if (!logOutputDirectory.isDirectory()) {
                 logOutputDirectory = workpath;
@@ -661,7 +621,6 @@ public class HeadlessServerConsole {
                             + "\" wird verwendet.");
             }
             logOutputDirectory.mkdirs();
-            // System.out.println("logOutputDirectory: " + logOutputDirectory);
 
             final KeyStroke configLoggerKeyStroke = KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK);
             final Action configAction = new AbstractAction() {
@@ -715,14 +674,6 @@ public class HeadlessServerConsole {
             serverClass = Class.forName(serverClassName);
             mainMethod = serverClass.getMethod("main", new Class[] { String[].class });
             getServerInstance = serverClass.getMethod("getServerInstance", null);
-
-//            tblInfo.setModel(new DefaultTableModel(new Object[][]{
-//                {"Online seit:","-"},
-//                {"ohne Fehler seit:","-"}
-//            },new String[] {"",""}
-//            ));
-//            tblInfo.setTableHeader(null);
-
         } catch (java.lang.NoClassDefFoundError e) {
             logger.fatal("Eine Klasse konnte nicht geladen werden der Server beendet sich", e);
             if (startsWithGui) {
@@ -825,6 +776,7 @@ public class HeadlessServerConsole {
                             serverStopped();
                             t.printStackTrace();
                         }
+                        // FIXME: catch Throwable
                     } catch (Throwable t) {
                         t.printStackTrace();
                         serverStopped();
@@ -873,6 +825,7 @@ public class HeadlessServerConsole {
                 serverStopped();
                 t.printStackTrace();
             }
+            // FIXME: catch Throwable
         } catch (Throwable t) {
             t.printStackTrace();
             serverStopped();
@@ -912,8 +865,6 @@ public class HeadlessServerConsole {
             serverInstance = getServerInstance.invoke(serverClass, null);
 
             if (serverInstance instanceof Sirius.server.middleware.impls.domainserver.DomainServerImpl) {
-//                UserGroup userGroup = new UserGroup(-1, userGroupName, "");
-//                User user = new User(-1, userName, "", userGroup);
                 final User user = new User(-1, userName, "");
 
                 final Method validateUser = serverClass.getMethod(
@@ -922,12 +873,10 @@ public class HeadlessServerConsole {
                 final Boolean refRet = (Boolean)validateUser.invoke(serverInstance, new Object[] { user, password });
                 ret = refRet.booleanValue() && isUserAdmin(userName);
             } else if (serverInstance instanceof Sirius.server.middleware.impls.proxy.StartProxy) {
-//                if( userGroupName.equals("proxy") && userName.equals("admin") && password.equals(adminPassword)) {
                 if (userName.equals("admin") && password.equals(adminPassword)) {
                     ret = true;
                 }
             } else if (serverInstance instanceof Sirius.server.registry.Registry) {
-//                if( userGroupName.equals("registry") && userName.equals("admin") && password.equals(adminPassword)) {
                 if (userName.equals("admin") && password.equals(adminPassword)) {
                     ret = true;
                 }
