@@ -213,12 +213,12 @@ public class HeadlessServerConsole {
      * @param  args  DOCUMENT ME!
      */
     private void initHeadlessServerConsole(final String[] args) {
-        StyleConstants.setForeground(
-            INFO,
-            (java.awt.Color)javax.swing.UIManager.getDefaults().get("CheckBoxMenuItem.selectionBackground"));
-        StyleConstants.setForeground(ERROR, Color.red);
-        StyleConstants.setForeground(STANDARD, Color.black);
         if (startsWithGui) {
+            StyleConstants.setForeground(
+                INFO,
+                (java.awt.Color)javax.swing.UIManager.getDefaults().get("CheckBoxMenuItem.selectionBackground"));
+            StyleConstants.setForeground(ERROR, Color.red);
+            StyleConstants.setForeground(STANDARD, Color.black);
             setMyOutStream(theGuiComponent, startsWithGui, INFO);
             setMyErrStream(theGuiComponent, startsWithGui, ERROR);
         } else {
