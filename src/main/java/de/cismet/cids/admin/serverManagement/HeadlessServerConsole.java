@@ -222,6 +222,8 @@ public class HeadlessServerConsole {
             setMyOutStream(theGuiComponent, startsWithGui, INFO);
             setMyErrStream(theGuiComponent, startsWithGui, ERROR);
         } else {
+            // we set the property, because the toolkit will fail to initialise on headless environments
+            System.setProperty("java.awt.headless", "true");
             setMyOutStream(null, startsWithGui, STANDARD);
             setMyErrStream(null, startsWithGui, STANDARD);
         }
