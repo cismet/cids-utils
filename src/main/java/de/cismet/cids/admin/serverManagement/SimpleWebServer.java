@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.*;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
@@ -83,7 +82,7 @@ public class SimpleWebServer {
         rootContext.setHandler(new ResourceHandler());
 //        rootContext.setResourceBase("webinterface");                            // NOI18N
         rootContext.setResourceBase(resoursceBaseDir);                          // NOI18N
-        final MovedContextHandler mch = new MovedContextHandler(server, "/", "/cidsservermanager");
+
         final HashMap map = new HashMap<String, String>();
         map.put("org.mortbay.jetty.servlet.SessionCookie", "XSESSIONID" + port);
         map.put("org.mortbay.jetty.servlet.SessionURL", "xsessionid");
@@ -96,15 +95,14 @@ public class SimpleWebServer {
         servlet.setInitParameter(
             "com.sun.jersey.config.property.packages",
             "de.cismet.cids.admin.serverManagement.servlet");
-        final Context managerContext = new Context(server, "/cidsservermanager", Context.SESSIONS); // NOI18N
+        final Context managerContext = new Context(server, "/", Context.SESSIONS); // NOI18N
         managerContext.setResourceBase(resoursceBaseDir);
         managerContext.addServlet(servlet, "/");
-        managerContext.setInitParams(map);                                                          // NOI18N
+        managerContext.setInitParams(map);                                         // NOI18N
 
         final ContextHandlerCollection contexts = new ContextHandlerCollection();
         contexts.setHandlers(
             new Handler[] {
-                mch,
                 rootContext,
                 managerContext,
             });

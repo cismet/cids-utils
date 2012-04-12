@@ -34,7 +34,7 @@ import de.cismet.cids.admin.serverManagement.HeadlessServerConsole;
  * @author   dmeiers
  * @version  $Revision$, $Date$
  */
-@Path("/")
+@Path("cidsservermanager")
 public class RESTfulServerManager {
 
     //~ Static fields/initializers ---------------------------------------------
