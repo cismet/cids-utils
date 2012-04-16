@@ -12,7 +12,7 @@
         <![endif]-->
 
         <!-- Le styles -->
-        <link href="/css/bootstrap.css" rel="stylesheet">
+        <link href="../css/bootstrap.css" rel="stylesheet">
         <style type="text/css">
             /* Override some defaults */
             html, body {
@@ -198,7 +198,7 @@
                     console.info("saveRuntimePropsButton is disabled");
                 }else{
                     dojo.xhrPost({
-                        url:"cidsservermanager/saveRuntimeProps",
+                        url:"/cidsservermanager/saveRuntimeProps",
                         //url:"foo",
                         form:dojo.byId("runtimePropertiesForm"),
                         handleAs:"text",
@@ -221,7 +221,7 @@
                     console.info("stopServer button is disabled");
                 }else{
                     dojo.xhrPost({
-                        url:"cidsservermanager/",
+                        url:"/cidsservermanager/",
                         //url:"foo",
                         postData:"server=stop",
                         handleAs:"text",
@@ -245,7 +245,7 @@
             function login(){
                 console.debug("sending login form");
                 dojo.xhrPost({
-                    url:"cidsservermanager/login",
+                    url:"/cidsservermanager/login",
                     //url:"foo",
                     form:dojo.byId("signInForm"),
                     handleAs:"text",
@@ -262,7 +262,7 @@
             function logout(){
 
                 dojo.xhrPost({
-                    url:"cidsservermanager/logout",
+                    url:"/cidsservermanager/logout",
                     //url:"foo",
                     handleAs:"text",
                     load: function(){
@@ -277,7 +277,7 @@
             function checkValidationStatus(){
                 
                 dojo.xhrGet({
-                    url:"cidsservermanager/checkValidationStatus",
+                    url:"/cidsservermanager/checkValidationStatus",
                     //url:"foo",
                     handleAs:"text",
                     load: function(response){
@@ -354,7 +354,7 @@
                 }else{
 				
                     dojo.xhrPost({
-                        url:"cidsservermanager",
+                        url:"/cidsservermanager/",
                         postData:"server=restart",
                         handleAs: "text",
                         load: function(){
@@ -432,7 +432,7 @@
                 dojo.xhrGet({
                     // The URL of the request
                     //url: "http://localhost/bootstrap/examples/runtime.properties",
-                    url: "cidsservermanager/serverTitle",
+                    url: "/cidsservermanager/serverTitle",
                     // The success callback with result from server
                     load: function(response){
                         console.info(response);

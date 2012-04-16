@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.*;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
@@ -78,39 +79,62 @@ public class SimpleWebServer {
                     .getResource("de/cismet/cids/admin/serverManagement/webserverroot")
                     .toExternalForm();
 
+        /*
+         * generate Contexts with an ResourceHandler that simply deliver (css, js, img) files. This is necessary since
+         * we forward requests for root to /cidsservermanager. In that case also the path for that (css, js, img) files
+         * changes.
+         *
+         */
         final Context rootContext = new Context(server, "/", Context.SESSIONS); // NOI18N
         rootContext.setHandler(new ResourceHandler());
-//        rootContext.setResourceBase("webinterface");                            // NOI18N
-        rootContext.setResourceBase(resoursceBaseDir);                          // NOI18N
+        rootContext.setResourceBase(resoursceBaseDir);
+        // NOI18N
+        final Context cssContext = new Context(server, "/css", Context.SESSIONS); // NOI18N
+        cssContext.setHandler(new ResourceHandler());
+        cssContext.setResourceBase(resoursceBaseDir + "/css");                    // NOI18N
 
+        final Context jsContext = new Context(server, "/js", Context.SESSIONS); // NOI18N
+        jsContext.setHandler(new ResourceHandler());
+        jsContext.setResourceBase(resoursceBaseDir + "/js");                    // NOI18N
+
+        final Context imgContext = new Context(server, "/img", Context.SESSIONS); // NOI18N
+        imgContext.setHandler(new ResourceHandler());
+        imgContext.setResourceBase(resoursceBaseDir + "/img");                    // NOI18N
+
+        // generate the Context that is responsible for delivering the RESTfulServerManager jersey app
         final HashMap map = new HashMap<String, String>();
         map.put("org.mortbay.jetty.servlet.SessionCookie", "XSESSIONID" + port);
         map.put("org.mortbay.jetty.servlet.SessionURL", "xsessionid");
 
         final ServletHolder servlet = new ServletHolder(ServletContainer.class);
-
         servlet.setInitParameter(
             "com.sun.jersey.config.property.resourceConfigClass",
             "com.sun.jersey.api.core.PackagesResourceConfig");
         servlet.setInitParameter(
             "com.sun.jersey.config.property.packages",
             "de.cismet.cids.admin.serverManagement.servlet");
-        final Context managerContext = new Context(server, "/", Context.SESSIONS); // NOI18N
-        managerContext.setResourceBase(resoursceBaseDir);
+        // bind the REST web-app to /cidsservermanager path
+        final Context managerContext = new Context(server, "/cidsservermanager", Context.SESSIONS); // NOI18N
         managerContext.addServlet(servlet, "/");
-        managerContext.setInitParams(map);                                         // NOI18N
+        managerContext.setInitParams(map);                                                          // NOI18N
 
+        // forward each request on root to the REST web-app
+        final MovedContextHandler mch = new MovedContextHandler(server, "/", "cidsservermanager");
+
+        // ContextHandlerCollection uses the longest prefix of the uri to determine the handler that handles the
+        // request.
         final ContextHandlerCollection contexts = new ContextHandlerCollection();
         contexts.setHandlers(
             new Handler[] {
-                rootContext,
                 managerContext,
+                cssContext,
+                jsContext,
+                imgContext,
+                mch,
+                rootContext,
             });
 
-        final HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] { contexts, new DefaultHandler() });
-
-        server.setHandlers(handlers.getHandlers());
+        server.setHandlers(contexts.getHandlers());
 
         initialised = true;
         if (LOG.isDebugEnabled()) {
