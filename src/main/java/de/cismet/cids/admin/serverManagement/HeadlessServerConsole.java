@@ -819,15 +819,10 @@ public class HeadlessServerConsole {
     public boolean validateUser(final String userGroupName, final String userName, final String password) {
         boolean ret = false;
 
-        final String adminPassword = "gibtskeins";
-
         try {
             /*
              * Method only available with the server type "domain server"
              * (Sirius.server.middleware.impls.domainserver.DomainServerImpl)
-             *
-             * wenn proxy: benutzername=admin, usergroup=proxy, pass=xxx Sirius.server.middleware.impls.proxy.StartProxy
-             * wenn registry: benutzername=admin, usergroup=registry, pass=xxx Sirius.server.registry.Registry
              */
 
             // Get instance of the running server, e.g. proxy, registry, domain server
@@ -842,22 +837,18 @@ public class HeadlessServerConsole {
                 final Boolean refRet = (Boolean)validateUser.invoke(serverInstance, new Object[] { user, password });
                 ret = refRet.booleanValue() && isUserAdmin(userName);
             } else if (serverInstance instanceof Sirius.server.middleware.impls.proxy.StartProxy) {
-                if (userName.equals("admin") && password.equals(adminPassword)) {
-                    ret = true;
-                }
+                // NOOP
             } else if (serverInstance instanceof Sirius.server.registry.Registry) {
-                if (userName.equals("admin") && password.equals(adminPassword)) {
-                    ret = true;
-                }
+                // NOOP
             } else {
                 throw new Exception("UnknownServerType during authentication occurred: "
                             + serverInstance.getClass().getName() + ".");
             }
-        } catch (Exception t) {
-            t.printStackTrace();
+        } catch (final Exception t) {
             System.err.println("\nBeim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.!!!\n");
             logger.fatal("Beim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.", t);
         }
+        
         return ret;
     }
 
