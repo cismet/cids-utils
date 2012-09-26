@@ -848,7 +848,7 @@ public class HeadlessServerConsole {
             System.err.println("\nBeim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.!!!\n");
             logger.fatal("Beim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.", t);
         }
-        
+
         return ret;
     }
 
