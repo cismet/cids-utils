@@ -41,6 +41,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.PropertyResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -113,6 +115,8 @@ public class HeadlessServerConsole {
     protected File logOutputDirectory;
     protected File workpath = null;
     FileEditor fileEditor = null;
+    private Integer logOutputLimit = 100;
+    private Integer logCleanerInterval = 60000;
     private Properties runtimeProperties;
     private String webInfAdminUser = null;
     private String webInfAdminPw = null;
@@ -130,7 +134,6 @@ public class HeadlessServerConsole {
         if (instance != null) {
             throw new RuntimeException("Es existiert bereits eine ServerConsole-Instanz!");
         }
-
         instance = this;
 
         initHeadlessServerConsole(args);
@@ -254,7 +257,6 @@ public class HeadlessServerConsole {
          * hints: - if the switch -p is not specified, the Miniature Server won't be started - the path specifications
          * log4jConfig and miniatureServerConfig can be absolute or relative
          */
-
         final int argl = args.length;
         int argn = 0;
         int control = 1;
@@ -318,6 +320,49 @@ public class HeadlessServerConsole {
             parameter.put("cidsServerArgs", serverArgs);
         } catch (IOException skip) {
             skip.printStackTrace();
+        }
+        /*
+         * Start a timer that clears the logStringBuffer to avoid memory issues if there are plenty of log messages
+         */
+
+        if (getRuntimeProperties().containsKey("serverConsole.logOutputLimit")) {
+            try {
+                logOutputLimit = Integer.parseInt(getRuntimeProperties().getProperty("serverConsole.logOutputLimit"));
+            } catch (NumberFormatException e) {
+                logger.error(
+                    "Could not parse property serverConsole.logOutputLimit in runtime.properties. Must be a valid Number. Setting limit to "
+                            + logOutputLimit,
+                    e);
+            }
+            if (getRuntimeProperties().containsKey("serverConsole.logOutputCleanerInterval")) {
+                try {
+                    final int intervalInSecs = Integer.parseInt(getRuntimeProperties().getProperty(
+                                "serverConsole.logOutputCleanerInterval"));
+                    logCleanerInterval = intervalInSecs * 1000;
+                } catch (NumberFormatException e) {
+                    logger.error(
+                        "Could not parse property serverConsole.logOutputCleanerInterval in runtime.properties. Must be a valid Number. Setting interval to "
+                                + logCleanerInterval,
+                        e);
+                }
+            }
+            final Timer logStringTimer = new Timer();
+            logStringTimer.scheduleAtFixedRate(new TimerTask() {
+
+                    @Override
+                    public void run() {
+                        final String[] logLines = logStringBuffer.toString().split("\n");
+                        if (logLines.length > logOutputLimit) {
+                            String result = "";
+                            for (int i = logLines.length - 1 - logOutputLimit; i < logLines.length; i++) {
+                                result += logLines[i];
+                                result += "\n";
+                            }
+                            clearLogMessages();
+                            logStringBuffer.append(result);
+                        }
+                    }
+                }, logCleanerInterval, logCleanerInterval);
         }
 
         if (args.length != 0) {
