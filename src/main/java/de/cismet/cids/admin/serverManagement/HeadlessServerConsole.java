@@ -114,6 +114,8 @@ public class HeadlessServerConsole {
     protected File workpath = null;
     FileEditor fileEditor = null;
     private Properties runtimeProperties;
+    private String webInfAdminUser = null;
+    private String webInfAdminPw = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -837,9 +839,9 @@ public class HeadlessServerConsole {
                 final Boolean refRet = (Boolean)validateUser.invoke(serverInstance, new Object[] { user, password });
                 ret = refRet.booleanValue() && isUserAdmin(userName);
             } else if (serverInstance instanceof Sirius.server.middleware.impls.proxy.StartProxy) {
-                // NOOP
+                ret = validateAdminUser(userName, password);
             } else if (serverInstance instanceof Sirius.server.registry.Registry) {
-                // NOOP
+                ret = validateAdminUser(userName, password);
             } else {
                 throw new Exception("UnknownServerType during authentication occurred: "
                             + serverInstance.getClass().getName() + ".");
@@ -850,6 +852,36 @@ public class HeadlessServerConsole {
         }
 
         return ret;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   userName  DOCUMENT ME!
+     * @param   password  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean validateAdminUser(final String userName, final String password) {
+        final Properties prop = getRuntimeProperties();
+
+        if ((this.webInfAdminUser == null)
+                    && prop.containsKey("serverConsole.webinterface.adminCredentials.username")) {
+            webInfAdminUser = prop.getProperty(
+                    "serverConsole.webinterface.adminCredentials.username");
+        }
+
+        if ((this.webInfAdminPw == null)
+                    && prop.containsKey("serverConsole.webinterface.adminCredentials.password")) {
+            webInfAdminPw = prop.getProperty("serverConsole.webinterface.adminCredentials.password");
+        }
+
+        if ((webInfAdminUser != null) && (webInfAdminPw != null)) {
+            if (userName.equals(webInfAdminUser) && webInfAdminPw.equals(password)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
