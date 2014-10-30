@@ -1,4 +1,4 @@
-cids-utils
+cids-utils [![Build Status](http://ci.cismet.de/buildStatus/icon?job=cids-utils)](https://ci.cismet.de/job/cids-utils/)
 ==========
 
 cids-utils is a utility library mainly focussed on providing a (GUI) console for the cids-server.
