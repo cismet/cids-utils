@@ -95,7 +95,6 @@
     </dependencies>
 
     <build>
-        <finalName>cidsUtils</finalName>
     </build>
 </project>
 
