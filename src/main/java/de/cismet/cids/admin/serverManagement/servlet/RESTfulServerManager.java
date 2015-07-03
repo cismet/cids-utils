@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.cids.admin.serverManagement.servlet;
 
+import com.sun.jersey.spi.container.servlet.WebComponent;
+
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
@@ -16,6 +18,8 @@ import java.io.*;
 import java.net.URL;
 
 import java.util.Properties;
+import java.util.logging.Filter;
+import java.util.logging.LogRecord;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -61,6 +65,18 @@ public class RESTfulServerManager {
      */
     public RESTfulServerManager() {
         serverCon = HeadlessServerConsole.getInstance();
+        final java.util.logging.Logger jerseyLogger = java.util.logging.Logger.getLogger(WebComponent.class.getName());
+        jerseyLogger.setFilter(new Filter() {
+
+                @Override
+                public boolean isLoggable(final LogRecord record) {
+                    boolean isLoggable = true;
+                    if (record.getMessage().contains("Only resource methods using @FormParam")) {
+                        isLoggable = false;
+                    }
+                    return isLoggable;
+                }
+            });
     }
 
     //~ Methods ----------------------------------------------------------------

@@ -141,7 +141,7 @@
                 // Using dojo.xhrGet, as very little information is being sent
                 dojo.xhrGet({
                     // The URL of the request
-                    url: "/cidsservermanager/serverConsole",
+                    url: "/cidsservermanager/serverConsole/",
                     load: function(consoleContent) {
                         //if console output contains html elements, they must be escaped in order to keep site structure 
                         consoleContent = consoleContent.replace(/</g,"&lt;");
@@ -170,7 +170,7 @@
                     dojo.xhrGet({
                         // The URL of the request
                         //url: "http://localhost/bootstrap/examples/runtime.properties",
-                        url: "/cidsservermanager/runtime.properties",
+                        url: "/cidsservermanager/runtime.properties/",
                         // The success callback with result from server
                         load: function(runtimePropsText) {
                             console.info(runtimePropsText);
@@ -198,7 +198,7 @@
                     console.info("saveRuntimePropsButton is disabled");
                 }else{
                     dojo.xhrPost({
-                        url:"/cidsservermanager/saveRuntimeProps",
+                        url:"/cidsservermanager/saveRuntimeProps/",
                         //url:"foo",
                         form:dojo.byId("runtimePropertiesForm"),
                         handleAs:"text",
@@ -245,7 +245,7 @@
             function login(){
                 console.debug("sending login form");
                 dojo.xhrPost({
-                    url:"/cidsservermanager/login",
+                    url:"/cidsservermanager/login/",
                     //url:"foo",
                     form:dojo.byId("signInForm"),
                     handleAs:"text",
@@ -262,7 +262,7 @@
             function logout(){
 
                 dojo.xhrPost({
-                    url:"/cidsservermanager/logout",
+                    url:"/cidsservermanager/logout/",
                     //url:"foo",
                     handleAs:"text",
                     load: function(){
@@ -277,7 +277,7 @@
             function checkValidationStatus(){
                 
                 dojo.xhrGet({
-                    url:"/cidsservermanager/checkValidationStatus",
+                    url:"/cidsservermanager/checkValidationStatus/",
                     //url:"foo",
                     handleAs:"text",
                     load: function(response){
@@ -411,7 +411,7 @@
                 dojo.xhrGet({
                     // The URL of the request
                     //url: "http://localhost/bootstrap/examples/runtime.properties",
-                    url: "/cidsservermanager/dbConnection",
+                    url: "/cidsservermanager/dbConnection/",
                     // The success callback with result from server
                     load: function(response){
                         console.info(response);
@@ -432,7 +432,7 @@
                 dojo.xhrGet({
                     // The URL of the request
                     //url: "http://localhost/bootstrap/examples/runtime.properties",
-                    url: "/cidsservermanager/serverTitle",
+                    url: "/cidsservermanager/serverTitle/",
                     // The success callback with result from server
                     load: function(response){
                         console.info(response);
@@ -454,7 +454,7 @@
                 dojo.xhrGet({
                     // The URL of the request
                     //url: "http://localhost/bootstrap/examples/runtime.properties",
-                    url: "/cidsservermanager/serverFriends",
+                    url: "/cidsservermanager/serverFriends/",
                     // The success callback with result from server
                     load: function(response){
                         console.info(response);
@@ -485,7 +485,7 @@
                 dojo.xhrGet({
                     // The URL of the request
                     //url: "http://localhost/bootstrap/examples/runtime.properties",
-                    url: "/cidsservermanager/serverLogfiles",
+                    url: "/cidsservermanager/serverLogfiles/",
                     // The success callback with result from server
                     load: function(response){
                         console.info(response);
@@ -494,7 +494,7 @@
                         var i=0;
                         var j = entry.length-1;
                         for(i=0;i<=j;i++){
-                            logFileList += '<li><a class="unreachable" link="/cidsservermanager/serverLogFile?name='+entry[i]+'"href="#" >'+ entry[i]+' - Logfile' +'</a></li>';
+                            logFileList += '<li><a class="unreachable" link="/cidsservermanager/serverLogFile/?name='+entry[i]+'"href="#" >'+ entry[i]+' - Logfile' +'</a></li>';
                             logFileList+='<li class="divider"></li>';
                         }
                         
@@ -562,7 +562,7 @@
                 //                }else{
                 console.info("test:"+logFileName);
                 dojo.xhrGet({
-                    url:"/cidsservermanager/serverLogFile",
+                    url:"/cidsservermanager/serverLogFile/",
                     content: {
                         name:logFileName
                     },
@@ -577,7 +577,7 @@
             }
             
             function getServerLogFile(){
-                window.open("/cidsservermanager/serverLogFile");
+                window.open("/cidsservermanager/serverLogFile/");
             }
             
             
@@ -589,7 +589,7 @@
                     console.info("stopServer button is disabled");
                 }else{
                     dojo.xhrPost({
-                        url:"/cidsservermanager/clearConsoleOutput",
+                        url:"/cidsservermanager/clearConsoleOutput/",
                         load: function(){
                             console.info("clear console output succesfull");		
                         },
