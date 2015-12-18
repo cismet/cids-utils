@@ -12,6 +12,8 @@ import Sirius.server.ServerExitError;
 import Sirius.server.ServerStatus;
 import Sirius.server.newuser.User;
 
+import com.iterative.groovy.service.GroovyShellService;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -80,7 +82,7 @@ public class HeadlessServerConsole {
     public static final long MILLISECONDS_WEEK = 604800000;
     protected static final int START_HELP_FILE = 1;
     protected static final int MAIN_HELP_FILE = 2;
-    protected static final String DEFAULT_MINIATURE_SERVER_PORT = "82";
+    protected static final String DEFAULT_MINIATURE_SERVER_PORT = "8082";
     protected static Boolean startsWithGui = false;
     protected static HeadlessServerConsole instance;
     protected static String serverManagementRoot = null;
@@ -218,6 +220,21 @@ public class HeadlessServerConsole {
      * @param  args  DOCUMENT ME!
      */
     private void initHeadlessServerConsole(final String[] args) {
+        final GroovyShellService service = new GroovyShellService();
+        service.setPort(6789);
+//        service.setBindings(new HashMap<String, Object>() {
+//            {
+//                put("foo", obj1);
+//                put("bar", obj2);
+//            }
+//        });
+
+        try {
+            service.start();
+        } catch (IOException iOException) {
+            iOException.printStackTrace();
+        }
+
         if (startsWithGui) {
             StyleConstants.setForeground(
                 INFO,
