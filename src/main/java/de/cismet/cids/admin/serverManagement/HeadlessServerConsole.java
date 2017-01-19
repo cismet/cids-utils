@@ -393,10 +393,9 @@ public class HeadlessServerConsole {
                     control += 2;
                 } else if (args[argn].equals("-a") && ((argn + 1) < argl)) {
                     serverArgs = new String[argl - control];
-                    for (int i = 0; i < (argl - control);) {
+                    for (int i = 0; i < (argl - control); i++) {
                         ++argn;
                         serverArgs[i] = args[argn];
-                        ++i;
                     }
                     parameter.put("cidsServerArgs", serverArgs);
                 } else {
