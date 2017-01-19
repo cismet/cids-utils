@@ -41,6 +41,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.PropertyResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -113,7 +115,11 @@ public class HeadlessServerConsole {
     protected File logOutputDirectory;
     protected File workpath = null;
     FileEditor fileEditor = null;
+    private Integer logOutputLimit = 100;
+    private Integer logCleanerInterval = 60000;
     private Properties runtimeProperties;
+    private String webInfAdminUser = null;
+    private String webInfAdminPw = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -128,7 +134,6 @@ public class HeadlessServerConsole {
         if (instance != null) {
             throw new RuntimeException("Es existiert bereits eine ServerConsole-Instanz!");
         }
-
         instance = this;
 
         initHeadlessServerConsole(args);
@@ -252,7 +257,6 @@ public class HeadlessServerConsole {
          * hints: - if the switch -p is not specified, the Miniature Server won't be started - the path specifications
          * log4jConfig and miniatureServerConfig can be absolute or relative
          */
-
         final int argl = args.length;
         int argn = 0;
         int control = 1;
@@ -316,6 +320,49 @@ public class HeadlessServerConsole {
             parameter.put("cidsServerArgs", serverArgs);
         } catch (IOException skip) {
             skip.printStackTrace();
+        }
+        /*
+         * Start a timer that clears the logStringBuffer to avoid memory issues if there are plenty of log messages
+         */
+
+        if (getRuntimeProperties().containsKey("serverConsole.logOutputLimit")) {
+            try {
+                logOutputLimit = Integer.parseInt(getRuntimeProperties().getProperty("serverConsole.logOutputLimit"));
+            } catch (NumberFormatException e) {
+                logger.error(
+                    "Could not parse property serverConsole.logOutputLimit in runtime.properties. Must be a valid Number. Setting limit to "
+                            + logOutputLimit,
+                    e);
+            }
+            if (getRuntimeProperties().containsKey("serverConsole.logOutputCleanerInterval")) {
+                try {
+                    final int intervalInSecs = Integer.parseInt(getRuntimeProperties().getProperty(
+                                "serverConsole.logOutputCleanerInterval"));
+                    logCleanerInterval = intervalInSecs * 1000;
+                } catch (NumberFormatException e) {
+                    logger.error(
+                        "Could not parse property serverConsole.logOutputCleanerInterval in runtime.properties. Must be a valid Number. Setting interval to "
+                                + logCleanerInterval,
+                        e);
+                }
+            }
+            final Timer logStringTimer = new Timer();
+            logStringTimer.scheduleAtFixedRate(new TimerTask() {
+
+                    @Override
+                    public void run() {
+                        final String[] logLines = logStringBuffer.toString().split("\n");
+                        if (logLines.length > logOutputLimit) {
+                            String result = "";
+                            for (int i = logLines.length - 1 - logOutputLimit; i < logLines.length; i++) {
+                                result += logLines[i];
+                                result += "\n";
+                            }
+                            clearLogMessages();
+                            logStringBuffer.append(result);
+                        }
+                    }
+                }, logCleanerInterval, logCleanerInterval);
         }
 
         if (args.length != 0) {
@@ -837,9 +884,9 @@ public class HeadlessServerConsole {
                 final Boolean refRet = (Boolean)validateUser.invoke(serverInstance, new Object[] { user, password });
                 ret = refRet.booleanValue() && isUserAdmin(userName);
             } else if (serverInstance instanceof Sirius.server.middleware.impls.proxy.StartProxy) {
-                // NOOP
+                ret = validateAdminUser(userName, password);
             } else if (serverInstance instanceof Sirius.server.registry.Registry) {
-                // NOOP
+                ret = validateAdminUser(userName, password);
             } else {
                 throw new Exception("UnknownServerType during authentication occurred: "
                             + serverInstance.getClass().getName() + ".");
@@ -848,8 +895,38 @@ public class HeadlessServerConsole {
             System.err.println("\nBeim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.!!!\n");
             logger.fatal("Beim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.", t);
         }
-        
+
         return ret;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   userName  DOCUMENT ME!
+     * @param   password  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean validateAdminUser(final String userName, final String password) {
+        final Properties prop = getRuntimeProperties();
+
+        if ((this.webInfAdminUser == null)
+                    && prop.containsKey("serverConsole.webinterface.adminCredentials.username")) {
+            webInfAdminUser = prop.getProperty(
+                    "serverConsole.webinterface.adminCredentials.username");
+        }
+
+        if ((this.webInfAdminPw == null)
+                    && prop.containsKey("serverConsole.webinterface.adminCredentials.password")) {
+            webInfAdminPw = prop.getProperty("serverConsole.webinterface.adminCredentials.password");
+        }
+
+        if ((webInfAdminUser != null) && (webInfAdminPw != null)) {
+            if (userName.equals(webInfAdminUser) && webInfAdminPw.equals(password)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
