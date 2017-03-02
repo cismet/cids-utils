@@ -150,7 +150,7 @@
         </goals>
         <properties>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.args>-Xms256m -Xmx1g -Djava.security.policy=policy.file -classpath %classpath de.cismet.cids.admin.serverManagement.ServerConsoleGui runtime.properties</exec.args>
+            <exec.args>-Xms256m -Xmx1g -Djava.security.policy=policy.file -classpath %classpath de.cismet.cids.admin.serverManagement.ServerConsoleGui</exec.args>
             <exec.workingdir>${de.cismet.cids.server.workingDir}</exec.workingdir>
             <exec.executable>java</exec.executable>
         </properties>
@@ -168,7 +168,7 @@
             <goal>org.codehaus.mojo:exec-maven-plugin:exec</goal>
         </goals>
         <properties>
-            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms256m -Xmx1g -Djava.security.policy=policy.file -classpath %classpath de.cismet.cids.admin.serverManagement.ServerConsoleGui runtime.properties</exec.args>
+            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms256m -Xmx1g -Djava.security.policy=policy.file -classpath %classpath de.cismet.cids.admin.serverManagement.ServerConsoleGui</exec.args>
             <exec.executable>java</exec.executable>
             <exec.workingdir>${de.cismet.cids.server.workingDir}</exec.workingdir>
             <jpda.listen>true</jpda.listen>
@@ -187,7 +187,7 @@
             <goal>org.codehaus.mojo:exec-maven-plugin:exec</goal>
         </goals>
         <properties>
-            <exec.args>${profiler.args} -Xms256m -Xmx1g -Djava.security.policy=policy.file -classpath %classpath de.cismet.cids.admin.serverManagement.ServerConsoleGui runtime.properties</exec.args>
+            <exec.args>${profiler.args} -Xms256m -Xmx1g -Djava.security.policy=policy.file -classpath %classpath de.cismet.cids.admin.serverManagement.ServerConsoleGui</exec.args>
             <exec.workingdir>${de.cismet.cids.server.workingDir}</exec.workingdir>
             <exec.executable>${profiler.java}</exec.executable>
         </properties>

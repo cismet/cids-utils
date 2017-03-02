@@ -89,25 +89,68 @@
         </dependency>
         <!-- END: cids-dependencies -->
         
+        <!-- BEGIN: Managed dependencies -->
+               <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-servlet</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <!-- END: Managed dependencies -->
+        
+        <!-- BEGIN: Runtime dependencies -->
+        <!--
+            By inlcuding this !runtime! binding we are forwarding
+            all log messages collected by slf4j to log4j!
+        -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- END: Runtime dependencies -->
+        
         <dependency>
             <groupId>org.codehaus.castor</groupId>
             <artifactId>castor-xml</artifactId>
             <version>1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-embedded</artifactId>
-            <version>6.1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.martiansoftware</groupId>
-            <artifactId>jsap</artifactId>
-            <version>2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.jgoodies</groupId>
@@ -115,10 +158,45 @@
             <version>2.2.2</version>
         </dependency>
         <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5-20081211</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        
+        <!--
+        Unused declared dependencies found:
+            org.mortbay.jetty:jetty-embedded:jar:6.1.9:compile
+            com.martiansoftware:jsap:jar:2.1:compile
+            javax.servlet.jsp:jsp-api:jar:2.1.2:compile
+            foxtrot:foxtrot:jar:1.3:compile
+        -->
+        <!--<dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-embedded</artifactId>
+        </dependency>
+        <dependency>
             <groupId>foxtrot</groupId>
             <artifactId>foxtrot</artifactId>
             <version>1.3</version>
         </dependency>
+         <dependency>
+            <groupId>com.martiansoftware</groupId>
+            <artifactId>jsap</artifactId>
+            <version>2.1</version>
+        </dependency>-->
     </dependencies>
 
     <build>
