@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -1198,11 +1199,10 @@ public class HeadlessServerConsole {
                     getRuntimeProperties().getProperty("connection.url"),
                     getRuntimeProperties().getProperty("connection.username"),
                     getRuntimeProperties().getProperty("connection.password"));
-            final Statement stmnt = dbCon.createStatement();
-            final ResultSet rs = stmnt.executeQuery(
-                    "Select administrator from cs_usr where login_name = '"
-                            + userName
-                            + "'");
+            final PreparedStatement stmnt = dbCon.prepareStatement(
+                    "Select administrator from cs_usr where login_name = ?");
+            stmnt.setString(1, userName);
+            final ResultSet rs = stmnt.executeQuery();
             while (rs.next()) {
                 ret = rs.getBoolean("administrator");
             }
