@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -57,7 +58,6 @@ import javax.swing.text.StyleConstants;
 import de.cismet.tools.CismetThreadPool;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import java.sql.PreparedStatement;
 
 /**
  * DOCUMENT ME!
@@ -1199,7 +1199,8 @@ public class HeadlessServerConsole {
                     getRuntimeProperties().getProperty("connection.url"),
                     getRuntimeProperties().getProperty("connection.username"),
                     getRuntimeProperties().getProperty("connection.password"));
-            final PreparedStatement stmnt = dbCon.prepareStatement("Select administrator from cs_usr where login_name = ?");
+            final PreparedStatement stmnt = dbCon.prepareStatement(
+                    "Select administrator from cs_usr where login_name = ?");
             stmnt.setString(1, userName);
             final ResultSet rs = stmnt.executeQuery();
             while (rs.next()) {
