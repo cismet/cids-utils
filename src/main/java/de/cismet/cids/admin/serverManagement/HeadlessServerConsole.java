@@ -58,6 +58,7 @@ import javax.swing.text.StyleConstants;
 import de.cismet.tools.CismetThreadPool;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import java.nio.file.FileSystems;
 
 /**
  * DOCUMENT ME!
@@ -1139,6 +1140,10 @@ public class HeadlessServerConsole {
      * @param  args  the command line arguments
      */
     public static void main(final String[] args) {
+        // WORKAROUNT(https://bugs.openjdk.java.net/browse/JDK-8194653) {
+        FileSystems.getDefault();
+        // {
+        
         final HeadlessServerConsole con = new HeadlessServerConsole(args);
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
