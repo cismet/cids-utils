@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import java.nio.file.FileSystems;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -58,7 +60,6 @@ import javax.swing.text.StyleConstants;
 import de.cismet.tools.CismetThreadPool;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import java.nio.file.FileSystems;
 
 /**
  * DOCUMENT ME!
@@ -1143,7 +1144,7 @@ public class HeadlessServerConsole {
         // WORKAROUNT(https://bugs.openjdk.java.net/browse/JDK-8194653) {
         FileSystems.getDefault();
         // {
-        
+
         final HeadlessServerConsole con = new HeadlessServerConsole(args);
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
