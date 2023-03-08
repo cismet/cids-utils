@@ -11,13 +11,13 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.apache.log4j.Logger;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.*;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.handler.ResourceHandler;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.*;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.util.HashMap;
 
@@ -83,26 +83,38 @@ public class SimpleWebServer {
          * changes.
          *
          */
-        final Context rootContext = new Context(server, "/", Context.SESSIONS); // NOI18N
+        final ServletContextHandler rootContext = new ServletContextHandler(
+                server,
+                "/",
+                ServletContextHandler.SESSIONS); // NOI18N
         rootContext.setHandler(new ResourceHandler());
         rootContext.setResourceBase(resoursceBaseDir);
         // NOI18N
-        final Context cssContext = new Context(server, "/css", Context.SESSIONS); // NOI18N
+        final ServletContextHandler cssContext = new ServletContextHandler(
+                server,
+                "/css",
+                ServletContextHandler.SESSIONS);               // NOI18N
         cssContext.setHandler(new ResourceHandler());
-        cssContext.setResourceBase(resoursceBaseDir + "/css");                    // NOI18N
+        cssContext.setResourceBase(resoursceBaseDir + "/css"); // NOI18N
 
-        final Context jsContext = new Context(server, "/js", Context.SESSIONS); // NOI18N
+        final ServletContextHandler jsContext = new ServletContextHandler(
+                server,
+                "/js",
+                ServletContextHandler.SESSIONS);             // NOI18N
         jsContext.setHandler(new ResourceHandler());
-        jsContext.setResourceBase(resoursceBaseDir + "/js");                    // NOI18N
+        jsContext.setResourceBase(resoursceBaseDir + "/js"); // NOI18N
 
-        final Context imgContext = new Context(server, "/img", Context.SESSIONS); // NOI18N
+        final ServletContextHandler imgContext = new ServletContextHandler(
+                server,
+                "/img",
+                ServletContextHandler.SESSIONS);               // NOI18N
         imgContext.setHandler(new ResourceHandler());
-        imgContext.setResourceBase(resoursceBaseDir + "/img");                    // NOI18N
+        imgContext.setResourceBase(resoursceBaseDir + "/img"); // NOI18N
 
         // generate the Context that is responsible for delivering the RESTfulServerManager jersey app
-        final HashMap map = new HashMap<String, String>();
-        map.put("org.mortbay.jetty.servlet.SessionCookie", "XSESSIONID" + port);
-        map.put("org.mortbay.jetty.servlet.SessionURL", "xsessionid");
+// final HashMap map = new HashMap<String, String>();
+// map.put("org.eclipse.jetty.servlet.SessionCookie", "XSESSIONID" + port);
+// map.put("org.eclipse.jetty.servlet.SessionURL", "xsessionid");
 
         final ServletHolder servlet = new ServletHolder(ServletContainer.class);
         servlet.setInitParameter(
@@ -112,9 +124,14 @@ public class SimpleWebServer {
             "com.sun.jersey.config.property.packages",
             "de.cismet.cids.admin.serverManagement.servlet");
         // bind the REST web-app to /cidsservermanager path
-        final Context managerContext = new Context(server, "/cidsservermanager", Context.SESSIONS); // NOI18N
+        final ServletContextHandler managerContext = new ServletContextHandler(
+                server,
+                "/cidsservermanager",
+                ServletContextHandler.SESSIONS); // NOI18N
         managerContext.addServlet(servlet, "/");
-        managerContext.setInitParams(map);                                                          // NOI18N
+//        managerContext.setInitParams(map);                                                          // NOI18N
+        managerContext.setInitParameter("org.eclipse.jetty.servlet.SessionCookie", "XSESSIONID" + port);
+        managerContext.setInitParameter("org.eclipse.jetty.servlet.SessionURL", "xsessionid");
 
         // forward each request on root to the REST web-app
         final MovedContextHandler mch = new MovedContextHandler(server, "/", "cidsservermanager");
@@ -132,7 +149,7 @@ public class SimpleWebServer {
                 rootContext,
             });
 
-        server.setHandlers(contexts.getHandlers());
+        server.setHandler(contexts);
 
         initialised = true;
         if (LOG.isDebugEnabled()) {
