@@ -12,23 +12,18 @@
  */
 package de.cismet.cids.admin.serverManagement;
 
-import Sirius.server.*;
-
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
+
+import org.apache.log4j.Logger;
 
 import java.awt.*;
 
 import java.io.IOException;
 
-import java.lang.reflect.*;
-
-import java.util.*;
-
 import javax.swing.*;
 import javax.swing.table.*;
-import javax.swing.text.*;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -50,9 +45,11 @@ public class ServerConsoleGui extends javax.swing.JFrame {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    protected static HeadlessServerConsole hsc;
+    private static Logger LOG = Logger.getLogger(ServerConsoleGui.class);
 
     //~ Instance fields --------------------------------------------------------
+
+    private final HeadlessServerConsole hsc;
 
     private ImageIcon red = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/cids/admin/serverConsole/buttons/redled.png"));
@@ -60,6 +57,9 @@ public class ServerConsoleGui extends javax.swing.JFrame {
                 "/de/cismet/cids/admin/serverConsole/buttons/yellowled.png"));
     private ImageIcon green = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/cids/admin/serverConsole/buttons/greenled.png"));
+
+    private FileEditor fileEditor = null;
+
     /** Displays the server's status with a JOptionPane. */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">
     /**
@@ -530,12 +530,12 @@ public class ServerConsoleGui extends javax.swing.JFrame {
     private void cmdEditActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_cmdEditActionPerformed
     {                                                                         //GEN-HEADEREND:event_cmdEditActionPerformed
 
-        if (hsc.fileEditor == null) {
-            hsc.fileEditor = new FileEditor();
+        if (fileEditor == null) {
+            fileEditor = new FileEditor();
         }
-        hsc.fileEditor.setFile(HeadlessServerConsole.cidsServerConfigFile);
-        if (!hsc.fileEditor.isShowing()) {
-            hsc.fileEditor.setVisible(true);
+        fileEditor.setFile(hsc.getCidsServerConfigFile());
+        if (!fileEditor.isShowing()) {
+            fileEditor.setVisible(true);
         }
     } //GEN-LAST:event_cmdEditActionPerformed
 
@@ -595,7 +595,7 @@ public class ServerConsoleGui extends javax.swing.JFrame {
      */
     private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdInfoActionPerformed
 
-        if (hsc.serverRunnin) {
+        if (hsc.isServerRunning()) {
             hsc.displayServerStatus();
         }
     } //GEN-LAST:event_cmdInfoActionPerformed
@@ -607,10 +607,10 @@ public class ServerConsoleGui extends javax.swing.JFrame {
      */
     private void cmdRestartActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRestartActionPerformed
 
-        if (hsc.serverRunnin) {
+        if (hsc.isServerRunning()) {
             shutdownServer();
         }
-        if (!hsc.serverRunnin) {
+        if (!hsc.isServerRunning()) {
             startServer();
         }
     } //GEN-LAST:event_cmdRestartActionPerformed
@@ -622,7 +622,7 @@ public class ServerConsoleGui extends javax.swing.JFrame {
      */
     private void cmdShutdownActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdShutdownActionPerformed
 
-        if (hsc.serverRunnin) {
+        if (hsc.isServerRunning()) {
             shutdownServer();
         }
     } //GEN-LAST:event_cmdShutdownActionPerformed
@@ -634,7 +634,7 @@ public class ServerConsoleGui extends javax.swing.JFrame {
      */
     private void exitForm(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_exitForm
 
-        if (hsc.serverRunnin) {
+        if (hsc.isServerRunning()) {
             final int answer = JOptionPane.showConfirmDialog(
                     this,
                     java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources").getString(
@@ -643,7 +643,7 @@ public class ServerConsoleGui extends javax.swing.JFrame {
                     JOptionPane.YES_NO_OPTION);
             if (answer == JOptionPane.YES_OPTION) {
                 shutdownServer();
-                if (HeadlessServerConsole.startMiniatureServer) {
+                if (hsc.isStartMiniatureServer()) {
                     shutdownMiniatureServer();
                 }
                 System.exit(0);
@@ -651,7 +651,7 @@ public class ServerConsoleGui extends javax.swing.JFrame {
                 this.show();
             }
         } else {
-            if (HeadlessServerConsole.startMiniatureServer) {
+            if (hsc.isStartMiniatureServer()) {
                 shutdownMiniatureServer();
             }
             System.exit(0);
@@ -698,10 +698,10 @@ public class ServerConsoleGui extends javax.swing.JFrame {
      * shuts down the Miniature Web Server and the cids server if it's still running before exiting the ServerConsole.
      */
     public void exit() {
-        if (hsc.serverRunnin) {
+        if (hsc.isServerRunning()) {
             shutdownServer();
         }
-        if (HeadlessServerConsole.startMiniatureServer) {
+        if (hsc.isStartMiniatureServer()) {
             shutdownMiniatureServer();
         }
         System.exit(0);
@@ -713,13 +713,13 @@ public class ServerConsoleGui extends javax.swing.JFrame {
     private void refreshInfo() {
         String online = "-";
         String withoutErrors = "-";
-        if (hsc.serverRunnin && (hsc.serverStartTime != -1)) {
-            final long seconds = System.currentTimeMillis() - hsc.serverStartTime;
+        if (hsc.isServerRunning() && (hsc.getServerStartTime() != -1)) {
+            final long seconds = System.currentTimeMillis() - hsc.getServerStartTime();
             online = HeadlessServerConsole.getDuration(seconds);
         }
 
-        if (hsc.serverRunnin && (HeadlessServerConsole.mySysErr.getLastInputTime() != -1)) {
-            final long seconds = System.currentTimeMillis() - HeadlessServerConsole.mySysErr.getLastInputTime();
+        if (hsc.isServerRunning() && (((MyPrintStream)System.err).getLastInputTime() != -1)) {
+            final long seconds = System.currentTimeMillis() - ((MyPrintStream)System.err).getLastInputTime();
             withoutErrors = HeadlessServerConsole.getDuration(seconds);
         } else {
             withoutErrors = online;
@@ -793,8 +793,8 @@ public class ServerConsoleGui extends javax.swing.JFrame {
 //            stMenu = new SysTrayMenu(stIcon,serverType);
         } else {
             System.err.println("System tray konnte nicht initialisiert werden! ");
-            if (HeadlessServerConsole.logger.isDebugEnabled()) {
-                HeadlessServerConsole.logger.debug("System tray konnte nicht initialisiert werden!");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("System tray konnte nicht initialisiert werden!");
             }
             cmdTray.setEnabled(false);
         }
@@ -828,7 +828,7 @@ public class ServerConsoleGui extends javax.swing.JFrame {
                 @Override
                 public void run() {
                     try {
-                        if (HeadlessServerConsole.startMiniatureServer) {
+                        if (conGui.hsc.isStartMiniatureServer()) {
                             conGui.startMiniatureServer();
                         }
                     } catch (Throwable e) {
