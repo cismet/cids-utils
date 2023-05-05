@@ -37,7 +37,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -84,43 +83,41 @@ public class HeadlessServerConsole {
     protected static final int START_HELP_FILE = 1;
     protected static final int MAIN_HELP_FILE = 2;
     protected static final String DEFAULT_MINIATURE_SERVER_PORT = "82";
-    protected static Boolean startsWithGui = false;
-    protected static HeadlessServerConsole instance;
-    protected static String serverManagementRoot = null;
-    protected static File cidsServerConfigFile;
-    protected static boolean startMiniatureServer = true;
-    protected static StringBuffer logStringBuffer = new StringBuffer();
-    protected static MyPrintStream mySysOut;
-    protected static MyPrintStream mySysErr;
-    static SimpleAttributeSet STANDARD = new SimpleAttributeSet();
-    static SimpleAttributeSet INFO = new SimpleAttributeSet();
-    static SimpleAttributeSet ERROR = new SimpleAttributeSet();
-    static Logger logger;
+    private static HeadlessServerConsole INSTANCE;
+    public static SimpleAttributeSet STANDARD = new SimpleAttributeSet();
+    public static SimpleAttributeSet INFO = new SimpleAttributeSet();
+    public static SimpleAttributeSet ERROR = new SimpleAttributeSet();
+    private static Logger LOG = Logger.getLogger(HeadlessServerConsole.class);
 
     //~ Instance fields --------------------------------------------------------
 
-    protected boolean serverRunnin = false;
-    protected String[] serverArgs = null;
-    protected String serverClassName = null;
-    protected Object serverInstance = null;
-    protected Method getServerInstance = null;
-    protected Method mainMethod = null;
-    protected Class serverClass = null;
-    protected JTextPane theGuiComponent = null;
-    protected ServerConsoleGui theGuiFrame = null;
-    protected String serverType = null;
-    protected String log4jConfig = "default";
-    protected String miniatureServerPort = null;
-    protected String miniatureServerConfig = "default";
-    protected String serverLogFileName;
-    protected long serverStartTime = -1;
-    protected SimpleWebServer minuatureServerInstance = null;
-    protected File logOutputDirectory;
-    protected File workpath = null;
-    FileEditor fileEditor = null;
+    private boolean startsWithGui = false;
+    private String serverManagementRoot = null;
+    private File cidsServerConfigFile;
+    private boolean startMiniatureServer = true;
+
+    private StringBuffer logStringBuffer = new StringBuffer();
+    private boolean serverRunning = false;
+    private String[] serverArgs = null;
+    private String serverClassName = null;
+    private Object serverInstance = null;
+    private Method getServerInstance = null;
+    private Method mainMethod = null;
+    private Class serverClass = null;
+    private JTextPane theGuiComponent = null;
+    private ServerConsoleGui theGuiFrame = null;
+    private String serverType = null;
+    private String log4jConfig = "default";
+    private String miniatureServerPort = null;
+    private String miniatureServerConfig = "default";
+    private String serverLogFileName;
+    private long serverStartTime = -1;
+    private SimpleWebServer minuatureServerInstance = null;
+    private File logOutputDirectory;
+    private File workpath = null;
     private Integer logOutputLimit = 100;
     private Integer logCleanerInterval = 60000;
-    private Properties runtimeProperties;
+    private final Properties runtimeProperties = new Properties();
     private String webInfAdminUser = null;
     private String webInfAdminPw = null;
 
@@ -134,10 +131,10 @@ public class HeadlessServerConsole {
      * @throws  RuntimeException  DOCUMENT ME!
      */
     protected HeadlessServerConsole(final String[] args) {
-        if (instance != null) {
+        if (INSTANCE != null) {
             throw new RuntimeException("Es existiert bereits eine ServerConsole-Instanz!");
         }
-        instance = this;
+        INSTANCE = this;
 
         initHeadlessServerConsole(args);
     }
@@ -153,14 +150,14 @@ public class HeadlessServerConsole {
      * @throws  RuntimeException  DOCUMENT ME!
      */
     protected HeadlessServerConsole(final String[] args,
-            final Boolean hasGui,
+            final boolean hasGui,
             final JTextPane component,
             final ServerConsoleGui gui) {
-        if (instance != null) {
+        if (INSTANCE != null) {
             throw new RuntimeException("Es existiert bereits eine ServerConsole-Instanz!");
         }
 
-        instance = this;
+        INSTANCE = this;
         startsWithGui = hasGui;
         theGuiComponent = component;
         theGuiFrame = gui;
@@ -175,8 +172,35 @@ public class HeadlessServerConsole {
      *
      * @return  DOCUMENT ME!
      */
+    public boolean isStartMiniatureServer() {
+        return startMiniatureServer;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public long getServerStartTime() {
+        return serverStartTime;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public File getCidsServerConfigFile() {
+        return cidsServerConfigFile;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public static HeadlessServerConsole getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     /**
@@ -212,7 +236,7 @@ public class HeadlessServerConsole {
      * @return  true if the cids server is running, false if the cids server is stopped
      */
     public boolean isServerRunning() {
-        return serverRunnin;
+        return serverRunning;
     }
 
     /**
@@ -266,111 +290,13 @@ public class HeadlessServerConsole {
 
         final Map parameter = new HashMap();
 
-        setRuntimeProperties(new Properties());
-        try {
-            cidsServerConfigFile = new File("runtime.properties"); // NOI18N
-            getRuntimeProperties().load(new FileInputStream(cidsServerConfigFile));
-            System.out.println("runtime.properties gefunden");
-            if (getRuntimeProperties().containsKey("serverConsole.serverTitle")) {
-                parameter.put("serverType", getRuntimeProperties().getProperty("serverConsole.serverTitle"));
-            } else {
-                parameter.put("serverType", getRuntimeProperties().getProperty("serverTitle"));
-            }
-
-            if (getRuntimeProperties().containsKey("serverConsole.serverClass")) {
-                parameter.put("serverClassName", getRuntimeProperties().getProperty("serverConsole.serverClass"));
-            } else {
-                parameter.put("serverClassName", getRuntimeProperties().getProperty("serverClass"));
-            }
-
-            if (getRuntimeProperties().containsKey("serverConsole.log4jConfig")) {
-                parameter.put("log4jConfig", getRuntimeProperties().getProperty("serverConsole.log4jConfig"));
-            } else {
-                parameter.put("log4jConfig", getRuntimeProperties().getProperty("log4jConfig"));
-            }
-
-            if (getRuntimeProperties().containsKey("serverConsole.webinterface.webserverPort")) {
-                parameter.put(
-                    "miniatureServerPort",
-                    getRuntimeProperties().getProperty("serverConsole.webinterface.webserverPort"));
-            } else {
-                parameter.put("miniatureServerPort", getRuntimeProperties().getProperty("webserverPort"));
-            }
-
-            if (getRuntimeProperties().containsKey("serverConsole.managementRoot")) {
-                parameter.put(
-                    "serverManagementRoot",
-                    getRuntimeProperties().getProperty("serverConsole.managementRoot"));
-            } else {
-                parameter.put("serverManagementRoot", getRuntimeProperties().getProperty("managementRoot"));
-            }
-
-            if (getRuntimeProperties().containsKey("serverConsole.webinterface.webserverInterfaceConfig")) {
-                parameter.put(
-                    "miniatureServerConfig",
-                    getRuntimeProperties().getProperty("serverConsole.webinterface.webserverInterfaceConfig"));
-            } else {
-                parameter.put("miniatureServerConfig", getRuntimeProperties().getProperty("webserverInterfaceConfig"));
-            }
-
-            if (getRuntimeProperties().containsKey("serverConsole.cidsServerRuntimeArgs")) {
-                serverArgs = getRuntimeProperties().getProperty("serverConsole.cidsServerRuntimeArgs").split(" ");
-            } else {
-                serverArgs = getRuntimeProperties().getProperty("runtimeArgs").split(" ");
-            }
-
-            serverLogFileName = getRuntimeProperties().getProperty("log4j.appender.ErrorHtml.file");
-            parameter.put("cidsServerArgs", serverArgs);
-        } catch (IOException skip) {
-            skip.printStackTrace();
-        }
-        /*
-         * Start a timer that clears the logStringBuffer to avoid memory issues if there are plenty of log messages
-         */
-
-        if (getRuntimeProperties().containsKey("serverConsole.logOutputLimit")) {
-            try {
-                logOutputLimit = Integer.parseInt(getRuntimeProperties().getProperty("serverConsole.logOutputLimit"));
-            } catch (NumberFormatException e) {
-                logger.error(
-                    "Could not parse property serverConsole.logOutputLimit in runtime.properties. Must be a valid Number. Setting limit to "
-                            + logOutputLimit,
-                    e);
-            }
-            if (getRuntimeProperties().containsKey("serverConsole.logOutputCleanerInterval")) {
-                try {
-                    final int intervalInSecs = Integer.parseInt(getRuntimeProperties().getProperty(
-                                "serverConsole.logOutputCleanerInterval"));
-                    logCleanerInterval = intervalInSecs * 1000;
-                } catch (NumberFormatException e) {
-                    logger.error(
-                        "Could not parse property serverConsole.logOutputCleanerInterval in runtime.properties. Must be a valid Number. Setting interval to "
-                                + logCleanerInterval,
-                        e);
-                }
-            }
-            final Timer logStringTimer = new Timer();
-            logStringTimer.scheduleAtFixedRate(new TimerTask() {
-
-                    @Override
-                    public void run() {
-                        final String[] logLines = logStringBuffer.toString().split("\n");
-                        if (logLines.length > logOutputLimit) {
-                            String result = "";
-                            for (int i = logLines.length - 1 - logOutputLimit; i < logLines.length; i++) {
-                                result += logLines[i];
-                                result += "\n";
-                            }
-                            clearLogMessages();
-                            logStringBuffer.append(result);
-                        }
-                    }
-                }, logCleanerInterval, logCleanerInterval);
-        }
-
         if (args.length != 0) {
             for (argn = 0; (argn < argl) && (args[argn].charAt(0) == '-');) {
-                if (args[argn].equals("-t") && ((argn + 1) < argl)) {
+                if (args[argn].equals("-r") && ((argn + 1) < argl)) {
+                    ++argn;
+                    parameter.put("runtimeProperties", args[argn]);
+                    control += 2;
+                } else if (args[argn].equals("-t") && ((argn + 1) < argl)) {
                     ++argn;
                     parameter.put("serverType", args[argn]);
                     control += 2;
@@ -435,7 +361,111 @@ public class HeadlessServerConsole {
                     JOptionPane.ERROR_MESSAGE);
                 theGuiFrame.showHelp(START_HELP_FILE);
             }
-            System.exit(0);
+            System.err.println("ungueltige_kommandozeilenparameterangabe");
+            System.exit(1);
+        }
+
+        try {
+            final String cidsServerConfigFileName = parameter.containsKey("runtimeProperties")
+                ? (String)parameter.get("runtimeProperties") : "runtime.properties";
+            cidsServerConfigFile = new File(cidsServerConfigFileName); // NOI18N
+            getRuntimeProperties().load(new FileInputStream(cidsServerConfigFile));
+            System.out.println(cidsServerConfigFileName + " gefunden");
+            if (getRuntimeProperties().containsKey("serverConsole.serverTitle")) {
+                parameter.put("serverType", getRuntimeProperties().getProperty("serverConsole.serverTitle"));
+            } else {
+                parameter.put("serverType", getRuntimeProperties().getProperty("serverTitle"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.serverClass")) {
+                parameter.put("serverClassName", getRuntimeProperties().getProperty("serverConsole.serverClass"));
+            } else {
+                parameter.put("serverClassName", getRuntimeProperties().getProperty("serverClass"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.log4jConfig")) {
+                parameter.put("log4jConfig", getRuntimeProperties().getProperty("serverConsole.log4jConfig"));
+            } else {
+                parameter.put("log4jConfig", getRuntimeProperties().getProperty("log4jConfig"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.webinterface.webserverPort")) {
+                parameter.put(
+                    "miniatureServerPort",
+                    getRuntimeProperties().getProperty("serverConsole.webinterface.webserverPort"));
+            } else {
+                parameter.put("miniatureServerPort", getRuntimeProperties().getProperty("webserverPort"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.managementRoot")) {
+                parameter.put(
+                    "serverManagementRoot",
+                    getRuntimeProperties().getProperty("serverConsole.managementRoot"));
+            } else {
+                parameter.put("serverManagementRoot", getRuntimeProperties().getProperty("managementRoot"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.webinterface.webserverInterfaceConfig")) {
+                parameter.put(
+                    "miniatureServerConfig",
+                    getRuntimeProperties().getProperty("serverConsole.webinterface.webserverInterfaceConfig"));
+            } else {
+                parameter.put("miniatureServerConfig", getRuntimeProperties().getProperty("webserverInterfaceConfig"));
+            }
+
+            if (getRuntimeProperties().containsKey("serverConsole.cidsServerRuntimeArgs")) {
+                serverArgs = getRuntimeProperties().getProperty("serverConsole.cidsServerRuntimeArgs").split(" ");
+            } else {
+                serverArgs = getRuntimeProperties().getProperty("runtimeArgs").split(" ");
+            }
+
+            serverLogFileName = getRuntimeProperties().getProperty("log4j.appender.ErrorHtml.file");
+            parameter.put("cidsServerArgs", serverArgs);
+        } catch (IOException skip) {
+            skip.printStackTrace();
+        }
+        /*
+         * Start a timer that clears the logStringBuffer to avoid memory issues if there are plenty of log messages
+         */
+
+        if (getRuntimeProperties().containsKey("serverConsole.logOutputLimit")) {
+            try {
+                logOutputLimit = Integer.parseInt(getRuntimeProperties().getProperty("serverConsole.logOutputLimit"));
+            } catch (NumberFormatException e) {
+                LOG.error(
+                    "Could not parse property serverConsole.logOutputLimit in runtime.properties. Must be a valid Number. Setting limit to "
+                            + logOutputLimit,
+                    e);
+            }
+            if (getRuntimeProperties().containsKey("serverConsole.logOutputCleanerInterval")) {
+                try {
+                    final int intervalInSecs = Integer.parseInt(getRuntimeProperties().getProperty(
+                                "serverConsole.logOutputCleanerInterval"));
+                    logCleanerInterval = intervalInSecs * 1000;
+                } catch (NumberFormatException e) {
+                    LOG.error(
+                        "Could not parse property serverConsole.logOutputCleanerInterval in runtime.properties. Must be a valid Number. Setting interval to "
+                                + logCleanerInterval,
+                        e);
+                }
+            }
+            final Timer logStringTimer = new Timer();
+            logStringTimer.scheduleAtFixedRate(new TimerTask() {
+
+                    @Override
+                    public void run() {
+                        final String[] logLines = logStringBuffer.toString().split("\n");
+                        if (logLines.length > logOutputLimit) {
+                            String result = "";
+                            for (int i = logLines.length - 1 - logOutputLimit; i < logLines.length; i++) {
+                                result += logLines[i];
+                                result += "\n";
+                            }
+                            clearLogMessages();
+                            logStringBuffer.append(result);
+                        }
+                    }
+                }, logCleanerInterval, logCleanerInterval);
         }
 
         /*
@@ -543,8 +573,7 @@ public class HeadlessServerConsole {
                 PropertyConfigurator.configure(log4jFile.toString());
             }
         }
-        HeadlessServerConsole.logger.getLogger("org.mortbay").setLevel((Level)Level.OFF);
-        HeadlessServerConsole.logger = HeadlessServerConsole.logger.getLogger(HeadlessServerConsole.class);
+        HeadlessServerConsole.LOG.getLogger("org.mortbay").setLevel((Level)Level.OFF);
 
         if (startsWithGui) {
             try {
@@ -586,7 +615,7 @@ public class HeadlessServerConsole {
                     serverProperties = new PropertyResourceBundle(this.getClass().getResourceAsStream(
                                 "/de/cismet/cids/admin/serverConsole/miniServer.cfg"));
                 } catch (Throwable e) {
-                    logger.error(java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources")
+                    LOG.error(java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources")
                                 .getString("Fehler_beim_Einlesen_der_Standard-Konfigurationsdatei_fuer_den_MiniServer"),
                         e);
                     System.err.println(java.util.ResourceBundle.getBundle(
@@ -608,7 +637,7 @@ public class HeadlessServerConsole {
                         serverProperties = new PropertyResourceBundle(this.getClass().getResourceAsStream(
                                     "/de/cismet/cids/admin/serverConsole/miniServer.cfg"));
                     } catch (Throwable e) {
-                        logger.error(java.util.ResourceBundle.getBundle(
+                        LOG.error(java.util.ResourceBundle.getBundle(
                                 "de/cismet/cids/admin/serverManagement/resources").getString(
                                 "Fehler_beim_Einlesen_der_Standard-Konfigurationsdatei_fuer_den_MiniServer"),
                             e);
@@ -622,7 +651,7 @@ public class HeadlessServerConsole {
                                 miniatureServerConfigFile);
                         serverProperties = new PropertyResourceBundle(miniatureServerConfigFileIn);
                     } catch (Throwable e) {
-                        logger.fatal(java.util.ResourceBundle.getBundle(
+                        LOG.fatal(java.util.ResourceBundle.getBundle(
                                 "de/cismet/cids/admin/serverManagement/resources").getString(
                                 "Fehler_beim_Einlesen_der_Konfigurationsparameter_fuer_den_MiniServer"),
                             e);
@@ -645,7 +674,7 @@ public class HeadlessServerConsole {
                     logOutputDirectory = new File(serverProperties.getString("LogOutputDirectory"));
                 }
             } catch (Throwable e) {
-                logger.error(
+                LOG.error(
                     "LogOutputDirectory konnte nicht aus der Konfigurationsdatei des Miniature Servers gelesen werden.",
                     e);
                 System.err.println(
@@ -693,7 +722,7 @@ public class HeadlessServerConsole {
             mainMethod = serverClass.getMethod("main", new Class[] { String[].class });
             getServerInstance = serverClass.getMethod("getServerInstance", null);
         } catch (java.lang.NoClassDefFoundError e) {
-            logger.fatal("Eine Klasse konnte nicht geladen werden der Server beendet sich", e);
+            LOG.fatal("Eine Klasse konnte nicht geladen werden der Server beendet sich", e);
             if (startsWithGui) {
                 JOptionPane.showMessageDialog(
                     theGuiFrame,
@@ -710,7 +739,7 @@ public class HeadlessServerConsole {
             System.err.println(java.util.ResourceBundle.getBundle(
                     "de/cismet/cids/admin/serverManagement/resources").getString(
                     "Der_Servername_ist_falsch_oder_unterstuetzt_nicht_das_cids-Servermanagement"));
-            logger.fatal(java.util.ResourceBundle.getBundle(
+            LOG.fatal(java.util.ResourceBundle.getBundle(
                     "de/cismet/cids/admin/serverManagement/resources").getString(
                     "Der_Servername_ist_falsch_oder_unterstuetzt_nicht_das_cids-Servermanagement"),
                 e);
@@ -735,9 +764,9 @@ public class HeadlessServerConsole {
         try {
             minuatureServerInstance = new SimpleWebServer(Integer.parseInt(miniatureServerPort));
             minuatureServerInstance.start();
-            logger.info("web server port: " + miniatureServerPort);
+            LOG.info("web server port: " + miniatureServerPort);
         } catch (Throwable e) {
-            logger.error("Fehler beim Starten des WebServers", e);
+            LOG.error("Fehler beim Starten des WebServers", e);
         }
     }
 
@@ -749,7 +778,7 @@ public class HeadlessServerConsole {
             theGuiFrame.getPrbStatus().setIndeterminate(true);
             theGuiFrame.getLblAmpel().setIcon(theGuiFrame.getYellow());
         }
-        serverRunnin = true;
+        serverRunning = true;
 
         new Thread(new Runnable() {
 
@@ -776,8 +805,8 @@ public class HeadlessServerConsole {
                             System.out.println(
                                 java.util.ResourceBundle.getBundle("de/cismet/cids/admin/serverManagement/resources")
                                             .getString("Der_Server_wurde_ordnungsgemaess_beendet"));
-                            if (logger.isDebugEnabled()) {
-                                logger.debug(
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug(
                                     java.util.ResourceBundle.getBundle(
                                         "de/cismet/cids/admin/serverManagement/resources").getString(
                                         "Der_cids_Server_wurde_ordnungsgemaess_beendet"));
@@ -786,11 +815,11 @@ public class HeadlessServerConsole {
                         } else if (t instanceof ServerExitError) {
                             t.printStackTrace();
                             System.err.println("\nDer Server hat sich aufgrund eines Fehlers beendet.\n");
-                            logger.fatal("Der cids Server hat sich aufgrund eines Fehlers beendet.", t);
+                            LOG.fatal("Der cids Server hat sich aufgrund eines Fehlers beendet.", t);
                             serverStopped();
                         } else {
                             System.err.println("\nDer Server wurde aufgrund eines Fehlers beendet.\n");
-                            logger.fatal("Der cids Server wurde aufgrund eines Fehlers beendet.", t);
+                            LOG.fatal("Der cids Server wurde aufgrund eines Fehlers beendet.", t);
                             serverStopped();
                             t.printStackTrace();
                         }
@@ -800,7 +829,7 @@ public class HeadlessServerConsole {
                         serverStopped();
                         System.err.println(
                             "\nBeim Starten des Servers ist ein Fehler aufgetreten\nDer Server befindet sich in einem undefinierten Zustand!!!\nBeenden Sie die ServerConsole!!!\n");
-                        logger.fatal("Beim Starten des cids Servers ist ein Fehler aufgetreten.", t);
+                        LOG.fatal("Beim Starten des cids Servers ist ein Fehler aufgetreten.", t);
                         if (startsWithGui) {
                             theGuiFrame.getLblAmpel().setIcon(theGuiFrame.getYellow());
                         }
@@ -828,18 +857,18 @@ public class HeadlessServerConsole {
                             "de/cismet/cids/admin/serverManagement/resources").getString(
                             "Der_Server_wurde_ordnungsgemaess_beendet"));
                 } catch (Exception ex) {
-                    logger.fatal("Could not load ResourceBundle", ex);
+                    LOG.fatal("Could not load ResourceBundle", ex);
                     System.out.println("Der Server wurde ordnungsgem�� beendent");
                 }
                 serverStopped();
             } else if (t instanceof ServerExitError) {
                 t.printStackTrace();
                 System.err.println("\nDer Server hat sich aufgrund eines Fehlers beendet.\n");
-                logger.fatal("Der cids Server hat sich aufgrund eines Fehlers beendet.", t);
+                LOG.fatal("Der cids Server hat sich aufgrund eines Fehlers beendet.", t);
                 serverStopped();
             } else {
                 System.err.println("\nDer Server wurde aufgrund eines Fehlers beendet.\n");
-                logger.fatal("Der cids Server wurde aufgrund eines Fehlers beendet.", t);
+                LOG.fatal("Der cids Server wurde aufgrund eines Fehlers beendet.", t);
                 serverStopped();
                 t.printStackTrace();
             }
@@ -849,7 +878,7 @@ public class HeadlessServerConsole {
             serverStopped();
             System.err.println(
                 "\nBeim Beenden des Servers ist ein Fehler aufgetreten\nDer Server befindet sich in einem undefinierten Zustand!!!\nBeenden Sie die ServerConsole!!!\n");
-            logger.fatal("Beim Beenden des cids Servers ist ein Fehler aufgetreten.", t);
+            LOG.fatal("Beim Beenden des cids Servers ist ein Fehler aufgetreten.", t);
             if (startsWithGui) {
                 theGuiFrame.getLblAmpel().setIcon(theGuiFrame.getYellow());
             }
@@ -895,7 +924,7 @@ public class HeadlessServerConsole {
             }
         } catch (final Exception t) {
             System.err.println("\nBeim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.!!!\n");
-            logger.fatal("Beim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.", t);
+            LOG.fatal("Beim Validieren des Benutzers " + userName + " ist ein Fehler aufgetreten.", t);
         }
 
         return ret;
@@ -940,7 +969,7 @@ public class HeadlessServerConsole {
                 minuatureServerInstance.stop();
             }
         } catch (Exception e) {
-            logger.error("Fehler beim Stoppen Webservers.", e);
+            LOG.error("Fehler beim Stoppen Webservers.", e);
         }
     }
 
@@ -952,7 +981,7 @@ public class HeadlessServerConsole {
 
                 @Override
                 public void run() {
-                    serverRunnin = false;
+                    serverRunning = false;
                     serverStartTime = -1;
                     if (startsWithGui) {
                         theGuiFrame.getLblAmpel().setIcon(theGuiFrame.getRed());
@@ -1078,9 +1107,8 @@ public class HeadlessServerConsole {
      * @param  set              DOCUMENT ME!
      */
     protected void setMyOutStream(final JTextPane theGuiComponent, final Boolean hasGui, final SimpleAttributeSet set) {
-        mySysOut = new MyPrintStream(System.out, logStringBuffer, theGuiComponent,
-                false, hasGui, set);
-        System.setOut(mySysOut);
+        System.setOut(new MyPrintStream(System.out, logStringBuffer, theGuiComponent,
+                false, hasGui, set));
     }
 
     /**
@@ -1091,9 +1119,8 @@ public class HeadlessServerConsole {
      * @param  set              DOCUMENT ME!
      */
     protected void setMyErrStream(final JTextPane theGuiComponent, final Boolean hasGui, final SimpleAttributeSet set) {
-        mySysErr = new MyPrintStream(System.err, logStringBuffer, theGuiComponent,
-                true, hasGui, set);
-        System.setErr(mySysErr);
+        System.setErr(new MyPrintStream(System.err, logStringBuffer, theGuiComponent,
+                true, hasGui, set));
     }
 
     /**
@@ -1120,7 +1147,7 @@ public class HeadlessServerConsole {
             java.util.logging.Logger.getLogger(HeadlessServerConsole.class.getName())
                     .log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            logger.error("Could not read ServerLogFile", ex);
+            LOG.error("Could not read ServerLogFile", ex);
         } finally {
             try {
                 if (fileReader != null) {
@@ -1160,7 +1187,7 @@ public class HeadlessServerConsole {
                 @Override
                 public void run() {
                     try {
-                        if (startMiniatureServer) {
+                        if (con.isStartMiniatureServer()) {
                             con.startMiniatureServer();
                         }
                     } catch (Throwable e) {
@@ -1228,14 +1255,5 @@ public class HeadlessServerConsole {
      */
     public Properties getRuntimeProperties() {
         return runtimeProperties;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  runtimeProperties  DOCUMENT ME!
-     */
-    public void setRuntimeProperties(final Properties runtimeProperties) {
-        this.runtimeProperties = runtimeProperties;
     }
 }
