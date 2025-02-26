@@ -16,6 +16,12 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.DefaultConfiguration;
+import org.apache.logging.log4j.core.config.xml.XmlConfiguration;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -27,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -557,7 +564,7 @@ public class HeadlessServerConsole {
          *
          */
         if (log4jConfig.equals("default")) {
-            BasicConfigurator.configure();
+            Configurator.initialize(new DefaultConfiguration()).start();
         } else {
             File log4jFile = new File(log4jConfig);
             if (!log4jFile.isAbsolute()) {
@@ -568,9 +575,15 @@ public class HeadlessServerConsole {
                         "de/cismet/cids/admin/serverManagement/resources").getString(
                         "Die_Konfigurationsdatei_fuer_log4j") + log4jFile
                             + "\" kann nicht gelesen werden! Es wird der BasicConfigurator benutzt.");
-                BasicConfigurator.configure();
+                Configurator.initialize(new DefaultConfiguration()).start();
             } else {
-                PropertyConfigurator.configure(log4jFile.toString());
+                try(final InputStream configStream = new FileInputStream(log4jFile)) {
+                    final ConfigurationSource source = new ConfigurationSource(configStream);
+                    final LoggerContext ctx = (LoggerContext)LogManager.getContext(false);
+                    ctx.start(new XmlConfiguration(ctx, source)); // Apply new configuration
+                } catch (IOException e) {
+                    System.err.println("Cannot read log4j config file: " + e.getMessage());
+                }
             }
         }
         HeadlessServerConsole.LOG.getLogger("org.mortbay").setLevel((Level)Level.OFF);
