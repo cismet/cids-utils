@@ -13,7 +13,7 @@
 
     <groupId>de.cismet.commons</groupId>
     <artifactId>cids-utils</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>9.0</version>
     <packaging>jar</packaging>
 
     <name>cids Utils</name>
@@ -23,7 +23,7 @@
         <connection>https://github.com/cismet/cids-utils.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/cids-utils.git</developerConnection>
         <url>https://github.com/cismet/cids-utils</url>
-        <tag>HEAD</tag>
+        <tag>v9.0</tag>
     </scm>
 
     <dependencyManagement>  
